@@ -1,0 +1,25 @@
+.validation-messages {
+    width: 355px;
+    margin: 15px;
+}
+
+.validation-message {
+    text-align: left;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+    display: none;
+}
+
+.validation-message:last-child {
+    margin-bottom: 0;
+}
+
+.input-error {
+    border-color: #ff4444 !important;
+}
+
+.validation-message.show-error {
+    color: #ff4444;
+    display: block;
+}

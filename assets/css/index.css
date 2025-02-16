@@ -1,0 +1,126 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f5f5f5;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 제목을 중앙 정렬 */
+    position: relative; /* back-button을 절대 위치로 배치하기 위해 필요 */
+    padding: 1rem;
+    border-bottom: 1px solid #111;
+    width: 100%;
+}
+
+.title {
+    font-size: 25px;
+    color: #333;
+}
+
+.login-title {
+    text-align: center;
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 3rem;
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 300px;
+}
+
+.login-form {
+    width: 392px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.input-group {
+    width: 355px;
+    display: flex;         
+    flex-direction: column; 
+    align-items: flex-start;  
+}
+
+.input-group.email {
+    margin-bottom: 15px;  /* 이메일 input-group의 아래 여백 */
+}
+
+.input-group.password {
+  /* 비밀번호 input-group의 아래 여백 */
+}
+
+.input-group input {
+    width: 355px;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.input-group label {
+    width: 355px;            
+    text-align: left; 
+    font-size: 15px;     
+    color: #333;
+}
+
+button {
+    width: 355px;
+    padding: 0.75rem;
+    background-color: #ACA0EB;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+
+}
+
+button:hover {
+    background-color: #7F6AEE;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.signup-button {
+    width: 355px;
+    padding: 0.75rem;
+    background-color: transparent;
+    color: #666;
+    border: 1px solid #ACA0EB;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.signup-link {
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.signup-link:hover {
+    color: #111;
+}
