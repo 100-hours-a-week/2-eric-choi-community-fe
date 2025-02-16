@@ -22,7 +22,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const profileImage = document.getElementById('profileImage');
     if (currentUser.profileImage) {
         profileImage.src = currentUser.profileImage;
-    }
+    }profileImage.addEventListener('click', function() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        
+        input.onchange = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profileImage').src = e.target.result;
+                    currentUser.profileImage = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+        input.click();
+    });
+    
 
     // 드롭다운 메뉴 토글
     profileIcon.addEventListener('click', function(e) {
@@ -55,6 +73,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-message';
+        toast.textContent = message;
+        
+        // 회원탈퇴 버튼 다음에 토스트 메시지 추가
+        const deleteAccountBtn = document.querySelector('.delete-account');
+        deleteAccountBtn.after(toast);
+    
+        setTimeout(() => {
+            toast.remove();
+        }, 2000);
+    }
+
 
     // 폼 제출 처리
     form.addEventListener('submit', function(e) {
@@ -80,19 +112,30 @@ document.addEventListener('DOMContentLoaded', function() {
         const users = JSON.parse(localStorage.getItem('users') || '[]');
         const updatedUsers = users.map(user => {
             if (user.email === currentUser.email) {
-                return { ...user, nickname: nickname };
+                return { 
+                    ...user, 
+                    nickname: nickname,
+                    profileImage: currentUser.profileImage  // 프로필 이미지도 업데이트
+                };
             }
             return user;
         });
+
 
         // 로컬 스토리지 업데이트
         localStorage.setItem('users', JSON.stringify(updatedUsers));
         localStorage.setItem('currentUser', JSON.stringify({
             ...currentUser,
-            nickname: nickname
+            nickname: nickname,
+            profileImage: currentUser.profileImage
         }));
 
-        window.location.href = './posts.html';
+        showToast('수정 완료');
+
+        // 3초 후 페이지 이동
+        setTimeout(() => {
+            window.location.href = './posts.html';
+        }, 2000);
     });
 
     // 입력시 에러메시지 숨김
@@ -107,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.removeItem('currentUser');
         window.location.href = '../index.html';
     });
+    
 
     // 모달 관련 요소 선택
     const modal = document.getElementById('deleteModal');

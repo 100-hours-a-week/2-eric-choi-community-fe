@@ -84,6 +84,7 @@ body {
     text-align: center;
     font-size: 24px;
     margin-bottom: 2rem;
+    margin-top: 150px;
 }
 
 .profile-section {
@@ -98,6 +99,19 @@ body {
     height: 120px;
     border-radius: 50%;
     overflow: hidden;
+}
+
+.profile-image:hover::after {
+    content: '변경';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 4px 8px;
+    border-radius: 4px;
 }
 
 .profile-image img {
@@ -228,4 +242,23 @@ body {
 .confirm-btn {
     background-color: #ACA0EB;
     color: 111;
+}
+
+.toast-message {
+    position: relative; 
+    width: fit-content;
+    margin: 20px auto 0;  
+    background-color:#ACA0EB;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 14px;
+    animation: fadeInOut 2s forwards;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
 }
