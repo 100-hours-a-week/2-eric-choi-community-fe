@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+    displayProfileIcon();
     const postList = document.querySelector('.post-list');
     const writeButton = document.querySelector('.write-button');
     const profileIcon = document.querySelector('.profile-icon');
@@ -12,59 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
         hasMore: true
     };
 
-    // 샘플 게시글 데이터
-    const samplePosts = [
-        {
-            id: 1,
-            title: "대 무 무",
-            content: "대 무 무",
-            author: "대 무 무",
-            date: "2024-02-15 12:30:00",
-            likes: 5,
-            views: 42
-        },
-        {
-            id: 2,
-            title: "대 레 이",
-            content: "대 레 이",
-            author: "대 레 이",
-            date: "2024-02-15 11:20:00",
-            likes: 8,
-            views: 67
-        },
-        {
-            id: 3,
-            title: "프론트 개어려움;;",
-            content: "프론트엔드 개발자를 목표로 공부중인데 조언 부탁드립니다.",
-            author: "쁘롱뜨",
-            date: "2024-02-15 10:15:00",
-            likes: 15,
-            views: 128
-        },
-        {
-            id: 4,
-            title: "가보자고",
-            content: "가보자고",
-            author: "가보자고",
-            date: "2024-02-15 09:45:00",
-            likes: 3,
-            views: 31
-        }
-    ];
-
-    // 추가 샘플 데이터 생성 (테스트용)
-    for (let i = 5; i <= 30; i++) {
-        samplePosts.push({
-            id: i,
-            title: `테스트 게시글 ${i}`,
-            content: `테스트 게시글 ${i}의 내용입니다.`,
-            author: `작성자${i}`,
-            date: new Date(2024, 1, 15, 12 - i).toLocaleString(),
-            likes: Math.floor(Math.random() * 50),
-            views: Math.floor(Math.random() * 200)
-        });
-    }
-    
     // 프로필 아이콘 클릭 이벤트 추가
     profileIcon.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -92,20 +40,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 게시글 HTML 생성 수정 - data-post-id 추가
     function createPostElement(post) {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const author = users.find(user => user.nickname === post.author);
+        const profileImage = author?.profileImage || '/api/placeholder/24/24';
+    
         return `
             <article class="post-item" data-post-id="${post.id}">
                 <h2 class="post-title">${post.title}</h2>
                 <div class="post-info">
                     <div class="post-stats">
                         <span>좋아요 ${post.likes}</span>
-                        <span>댓글 ${post.comments || 0}</span>
+                        <span>댓글 ${post.comments?.length || 0}</span>
                         <span>조회수 ${post.views}</span>
                     </div>
                     <span class="post-date">${post.date}</span>
                 </div>
                 <div class="post-divider"></div>
                 <div class="post-author">
-                    <img src="/api/placeholder/24/24" alt="작성자 프로필" class="author-img">
+                    <img src="${profileImage}" alt="작성자 프로필" class="author-img">
                     <span class="author-name">${post.author}</span>
                 </div>
             </article>
@@ -121,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 나머지 기존 함수들은 그대로 유지
+  
     function getPostsFromStorage() {
         const posts = localStorage.getItem('posts');
         return posts ? JSON.parse(posts) : [];
@@ -188,6 +140,15 @@ document.addEventListener('DOMContentLoaded', function() {
         postList.after(sentinel);
 
         observer.observe(sentinel);
+    }
+
+    function displayProfileIcon() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        const profileImg = document.querySelector('.profile-icon img');
+        
+        if (currentUser && currentUser.profileImage) {
+            profileImg.src = currentUser.profileImage;
+        }
     }
 
     // 초기화 및 표시

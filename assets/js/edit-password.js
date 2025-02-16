@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+    displayProfileIcon();
     const form = document.getElementById('editForm');
     const passwordInput = document.getElementById('password');
     const passwordConfirmInput = document.getElementById('passwordConfirm');
@@ -21,6 +22,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const isAllValid = Object.values(validationState).every(value => value === true);
         submitButton.disabled = !isAllValid;
         submitButton.style.opacity = isAllValid ? '1' : '0.5';
+    }
+
+    function displayProfileIcon() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        const profileImg = document.querySelector('.profile-icon img');
+        
+        if (currentUser && currentUser.profileImage) {
+            profileImg.src = currentUser.profileImage;
+        }
     }
 
     // 현재 로그인한 사용자 확인

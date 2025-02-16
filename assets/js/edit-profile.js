@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+    displayProfileIcon();
     const form = document.getElementById('editForm');
     const emailInput = document.getElementById('email');
     const nicknameInput = document.getElementById('nickname');
@@ -17,6 +18,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // 현재 사용자 정보 표시
     emailInput.value = currentUser.email;
     nicknameInput.value = currentUser.nickname;
+
+    const profileImage = document.getElementById('profileImage');
+    if (currentUser.profileImage) {
+        profileImage.src = currentUser.profileImage;
+    }
 
     // 드롭다운 메뉴 토글
     profileIcon.addEventListener('click', function(e) {
@@ -39,6 +45,16 @@ document.addEventListener('DOMContentLoaded', function() {
             user.nickname === nickname
         );
     }
+
+    function displayProfileIcon() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        const profileImg = document.querySelector('.profile-icon img');
+        
+        if (currentUser && currentUser.profileImage) {
+            profileImg.src = currentUser.profileImage;
+        }
+    }
+
 
     // 폼 제출 처리
     form.addEventListener('submit', function(e) {
@@ -93,9 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 모달 관련 요소 선택
-    const deleteAccountBtn = document.querySelector('.delete-account');
     const modal = document.getElementById('deleteModal');
-    const cancelBtn = modal.querySelector('.cancel-btn');
     const confirmBtn = modal.querySelector('.confirm-btn');
 
     confirmBtn.addEventListener('click', function() {

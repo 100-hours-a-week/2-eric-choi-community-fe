@@ -59,11 +59,6 @@ body {
 .input-group.email {
     margin-bottom: 15px;  /* 이메일 input-group의 아래 여백 */
 }
-
-.input-group.password {
-  /* 비밀번호 input-group의 아래 여백 */
-}
-
 .input-group input {
     width: 355px;
     padding: 0.5rem;

@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+    displayProfileIcon();
     const form = document.getElementById('postForm');
     const titleInput = document.getElementById('title');
     const contentInput = document.getElementById('content');
@@ -110,6 +111,15 @@ document.addEventListener('DOMContentLoaded', function() {
             savePost(newPost);
         }
     });
+
+    function displayProfileIcon() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        const profileImg = document.querySelector('.profile-icon img');
+        
+        if (currentUser && currentUser.profileImage) {
+            profileImg.src = currentUser.profileImage;
+        }
+    }
 
     function savePost(post) {
         const posts = JSON.parse(localStorage.getItem('posts') || '[]');
