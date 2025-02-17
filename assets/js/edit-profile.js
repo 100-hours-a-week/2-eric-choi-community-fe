@@ -7,15 +7,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const profileIcon = document.querySelector('.profile-icon');
     const dropdownMenu = document.querySelector('.dropdown-menu');
 
-    // 현재 로그인한 사용자 정보 가져오기
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) {
-        // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
+
         window.location.href = '../index.html';
         return;
     }
 
-    // 현재 사용자 정보 표시
+
     emailInput.value = currentUser.email;
     nicknameInput.value = currentUser.nickname;
 
@@ -63,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkNicknameDuplicate(nickname) {
         const users = JSON.parse(localStorage.getItem('users') || '[]');
         return users.some(user => 
-            user.email !== currentUser.email && // 자기 자신은 제외
+            user.email !== currentUser.email && 
             user.nickname === nickname
         );
     }
@@ -119,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return { 
                     ...user, 
                     nickname: nickname,
-                    profileImage: currentUser.profileImage  // 프로필 이미지도 업데이트
+                    profileImage: currentUser.profileImage  
                 };
             }
             return user;
@@ -136,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         showToast('수정 완료');
 
-        // 3초 후 페이지 이동
+   
         setTimeout(() => {
             window.location.href = './posts.html';
         }, 2000);

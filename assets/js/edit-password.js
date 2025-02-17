@@ -60,21 +60,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!password) {
             helperText.textContent = '*비밀번호를 입력해주세요';
-            helperText.style.display = 'block';  // display 속성 직접 변경
+            helperText.style.display = 'block';  
             this.style.borderColor = '#ff0000';
             validationState.password = false;
         } else if (!passwordRegex.test(password)) {
             helperText.textContent = '*비밀번호는 8자 이상, 20자 이하이며, 대문자, 소문자, 숫자, 특수문자를 각각 최소 1개 포함해야 합니다.';
-            helperText.style.display = 'block';  // display 속성 직접 변경
+            helperText.style.display = 'block'; 
             this.style.borderColor = '#ff0000';
             validationState.password = false;
         } else {
-            helperText.style.display = 'none';   // display 속성 직접 변경
+            helperText.style.display = 'none';   /
             this.style.borderColor = '#111';
             validationState.password = true;
         }
         
-        // 비밀번호 확인 필드 재검사
+ 
         if (passwordConfirmInput.value) {
             passwordConfirmInput.dispatchEvent(new Event('input'));
         }
@@ -87,29 +87,29 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!this.value) {
             helperText.textContent = '*비밀번호를 한번 더 입력해주세요';
-            helperText.style.display = 'block';  // display 속성 직접 변경
+            helperText.style.display = 'block';  
             this.style.borderColor = '#ff0000';
             validationState.passwordConfirm = false;
         } else if (this.value !== passwordInput.value) {
             helperText.textContent = '*비밀번호가 다릅니다.';
-            helperText.style.display = 'block';  // display 속성 직접 변경
+            helperText.style.display = 'block'; 
             this.style.borderColor = '#ff0000';
             validationState.passwordConfirm = false;
         } else {
-            helperText.style.display = 'none';   // display 속성 직접 변경
+            helperText.style.display = 'none';  
             this.style.borderColor = '#111';
             validationState.passwordConfirm = true;
         }
         checkFormValidity();
     });
 
-    // 폼 제출 처리 추가
+
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const newPassword = passwordInput.value;
 
-        // users 배열에서 현재 사용자의 비밀번호 업데이트
+
         const users = JSON.parse(localStorage.getItem('users') || '[]');
         const updatedUsers = users.map(user => {
             if (user.email === currentUser.email) {
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return user;
         });
 
-        // 로컬 스토리지 업데이트
+ 
         localStorage.setItem('users', JSON.stringify(updatedUsers));
         window.location.href = './posts.html';
     });

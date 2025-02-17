@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = './make-post.html';
     });
 
-    // 게시글 HTML 생성 수정 - data-post-id 추가
+    // 게시글 HTML 생성 수정 
     function createPostElement(post) {
         const users = JSON.parse(localStorage.getItem('users') || '[]');
         const author = users.find(user => user.nickname === post.author);
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 초기화 및 표시
+
     initializeSampleData();
     displayPosts();
     setupInfiniteScroll();

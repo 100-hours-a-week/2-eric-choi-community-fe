@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
             contentError.style.display = 'none';
         } else {
             submitButton.classList.remove('active');
-            // 제목이나 내용이 비어있으면 에러 메시지 표시
+
             contentError.style.display = 'block';
         }
     }
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 현재 로그인한 사용자 정보 가져오기
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
         if (!currentUser) {
-            // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
+ 
             window.location.href = '../index.html';
             return;
         }
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
             id: Date.now(),
             title: title,
             content: content,
-            author: currentUser.nickname,  // currentUser에서 닉네임 가져오기
+            author: currentUser.nickname,  
             date: new Date().toLocaleString(),
             likes: 0,
             views: 0,
@@ -133,14 +133,14 @@ document.addEventListener('DOMContentLoaded', function() {
         dropdownMenu.classList.toggle('show');
     });
     
-    // 다른 곳을 클릭하면 드롭다운 메뉴 닫기
+
     document.addEventListener('click', function(e) {
         if (!profileIcon.contains(e.target)) {
             dropdownMenu.classList.remove('show');
         }
     });
     
-    // ESC 키를 누르면 드롭다운 메뉴 닫기
+
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             dropdownMenu.classList.remove('show');

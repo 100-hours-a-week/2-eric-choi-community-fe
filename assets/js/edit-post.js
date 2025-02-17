@@ -31,10 +31,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 fileName.textContent = '기존 이미지가 있습니다.';
             }
     
-            // 폼이 유효하므로 버튼 활성화
+  
             submitButton.disabled = false;
             submitButton.classList.add('active');
-            contentError.style.display = 'none';  // helper text 숨기기
+            contentError.style.display = 'none'; 
             submitButton.textContent = '수정하기';
         }
     }
@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const postIndex = posts.findIndex(p => p.id.toString() === postId);
 
         if (postIndex !== -1) {
-            // 이미지 처리
+
             if (selectedFile) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
                 reader.readAsDataURL(selectedFile);
             } else {
-                // 이미지가 변경되지 않은 경우
+
                 posts[postIndex] = {
                     ...posts[postIndex],
                     title: title,

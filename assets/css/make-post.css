@@ -48,7 +48,8 @@ body {
     border-radius: 50%;
     overflow: visible;
     cursor: pointer;
-    margin-left: 400px;  /* 프로필 아이콘 오른쪽 여백 */
+    margin-left: 400px; 
+    
 }
 .profile-img {
     width: 100%;
@@ -173,7 +174,7 @@ body {
 .helper-text {
     font-size: 0.85rem;
     color: #666;
-    display: none;  /* 기본적으로 숨김 */
+    display: none;  
 }
 
 .helper-text.error {
@@ -183,19 +184,19 @@ body {
 
 .submit-button {
     padding: 1rem;
-    background-color: #ACA0EB;  /* 비활성화 상태의 색상 */
+    background-color: #ACA0EB; 
     color: white;
     border: none;
     border-radius: 4px;
     font-size: 1rem;
     cursor: pointer;
     margin-top: 1rem;
-    opacity: 0.5;  /* 비활성화 상태에서는 투명도 적용 */
+    opacity: 0.5;  
     transition: all 0.3s ease;
 }
 
 .submit-button.active {
-    background-color: #7F6AEE;  /* 활성화 상태의 색상 */
+    background-color: #7F6AEE;  
     opacity: 1;
 }
 

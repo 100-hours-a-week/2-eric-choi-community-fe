@@ -33,7 +33,7 @@ body {
     border-radius: 50%;
     overflow: visible;
     cursor: pointer;
-    margin-left: 400px;  /* 프로필 아이콘 오른쪽 여백 */
+    margin-left: 400px;  
 }
 .profile-img {
     width: 100%;

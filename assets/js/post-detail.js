@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function displayPost() {
         const post = getPost();
-        const users = JSON.parse(localStorage.getItem('users') || '[]');  // users 변수 추가
+        const users = JSON.parse(localStorage.getItem('users') || '[]'); 
         if (!post) {
             window.location.href = './posts.html';
             return;
@@ -208,11 +208,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     commentInput.addEventListener('keydown', function(e) {
-        // Shift + Enter일 때만 줄바꿈 허용
+
         if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault(); // 일반 Enter 키의 기본 동작 방지
-            if (!this.value.trim()) return; // 빈 내용이면 제출하지 않음
-            commentForm.dispatchEvent(new Event('submit')); // 폼 제출
+            e.preventDefault(); 
+            if (!this.value.trim()) return; 
+            commentForm.dispatchEvent(new Event('submit')); 
         }
     });
 

@@ -16,8 +16,8 @@ body {
 .header {
     display: flex;
     align-items: center;
-    justify-content: center; /* 제목을 중앙 정렬 */
-    position: relative; /* back-button을 절대 위치로 배치하기 위해 필요 */
+    justify-content: center; 
+    position: relative; 
     padding: 1rem;
     border-bottom: 1px solid #111;
     width: 100%;
@@ -57,7 +57,7 @@ body {
 }
 
 .input-group.email {
-    margin-bottom: 15px;  /* 이메일 input-group의 아래 여백 */
+    margin-bottom: 15px; 
 }
 .input-group input {
     width: 355px;

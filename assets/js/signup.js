@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 새로운 사용자 객체 생성
         const newUser = {
             email: emailInput.value,
-            password: passwordInput.value, // 실제로는 비밀번호 해싱이 필요하지만 예시이므로 생략
+            password: passwordInput.value,
             nickname: nicknameInput.value,
             profileImage: profileImageUrl
         };
