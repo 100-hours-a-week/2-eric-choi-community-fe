@@ -22,24 +22,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const profileImage = document.getElementById('profileImage');
     if (currentUser.profileImage) {
         profileImage.src = currentUser.profileImage;
-    }profileImage.addEventListener('click', function() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        
-        input.onchange = function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('profileImage').src = e.target.result;
-                    currentUser.profileImage = e.target.result;
+    }
+
+    const profileImageContainer = document.querySelector('.profile-image');
+        profileImageContainer.addEventListener('click', function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        profileImage.src = e.target.result;
+                        currentUser.profileImage = e.target.result;
+                        profileIcon.querySelector('img').src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
                 }
-                reader.readAsDataURL(file);
             }
-        }
-        input.click();
-    });
+            input.click();
+        });
     
 
     // 드롭다운 메뉴 토글
