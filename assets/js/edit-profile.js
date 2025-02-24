@@ -1,87 +1,107 @@
-document.addEventListener('DOMContentLoaded', function() {
-    displayProfileIcon();
+document.addEventListener('DOMContentLoaded', async function() {
     const form = document.getElementById('editForm');
     const emailInput = document.getElementById('email');
     const nicknameInput = document.getElementById('nickname');
     const nicknameError = document.getElementById('nicknameError');
     const profileIcon = document.querySelector('.profile-icon');
     const dropdownMenu = document.querySelector('.dropdown-menu');
+    const modal = document.getElementById('deleteModal');
+    const confirmBtn = modal.querySelector('.confirm-btn');
+    let selectedFile = null;
 
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (!currentUser) {
+    // 현재 로그인한 사용자 정보 가져오기
+    let currentUser;
+    try {
+        const userResponse = await fetch('/data/users.json');
+        const userData = await userResponse.json();
+        currentUser = userData.data;
+        
+        // 폼에 현재 사용자 정보 설정
+        emailInput.value = currentUser.email;
+        nicknameInput.value = currentUser.nickname;
 
+        // 프로필 이미지 설정
+        const profileImage = document.getElementById('profileImage');
+        const profileImg = document.querySelector('.profile-icon img');
+        if (currentUser.profileImage) {
+            profileImage.src = currentUser.profileImage;
+            profileImg.src = currentUser.profileImage;
+        }
+    } catch (error) {
+        console.error('Error fetching user:', error);
         window.location.href = '../index.html';
         return;
     }
 
-
-    emailInput.value = currentUser.email;
-    nicknameInput.value = currentUser.nickname;
-
-    const profileImage = document.getElementById('profileImage');
-    if (currentUser.profileImage) {
-        profileImage.src = currentUser.profileImage;
+    // 프로필 수정 API
+    async function updateProfile(profileData) {
+        try {
+            const response = await fetch(`/users/${currentUser.id}/profile`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: currentUser.id,
+                    nickname: profileData.nickname,
+                    profile_image: profileData.profileImage
+                })
+            });
+            return true;
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            return false;
+        }
     }
 
+    // 회원 탈퇴 API
+    async function deleteUser() {
+        try {
+            const response = await fetch(`/users/${currentUser.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: currentUser.id
+                })
+            });
+            return true;
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            return false;
+        }
+    }
+
+    // 이미지 업로드 처리
     const profileImageContainer = document.querySelector('.profile-image');
-        profileImageContainer.addEventListener('click', function() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        profileImage.src = e.target.result;
-                        currentUser.profileImage = e.target.result;
-                        profileIcon.querySelector('img').src = e.target.result;
-                    }
-                    reader.readAsDataURL(file);
-                }
-            }
-            input.click();
-        });
-    
-
-    // 드롭다운 메뉴 토글
-    profileIcon.addEventListener('click', function(e) {
-        e.stopPropagation();
-        dropdownMenu.classList.toggle('show');
-    });
-
-    // 외부 클릭시 드롭다운 메뉴 닫기
-    document.addEventListener('click', function(e) {
-        if (!profileIcon.contains(e.target)) {
-            dropdownMenu.classList.remove('show');
-        }
-    });
-
-    // 닉네임 중복 체크
-    function checkNicknameDuplicate(nickname) {
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        return users.some(user => 
-            user.email !== currentUser.email && 
-            user.nickname === nickname
-        );
-    }
-
-    function displayProfileIcon() {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        const profileImg = document.querySelector('.profile-icon img');
+    profileImageContainer.addEventListener('click', function() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
         
-        if (currentUser && currentUser.profileImage) {
-            profileImg.src = currentUser.profileImage;
+        input.onchange = async function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const profileImage = document.getElementById('profileImage');
+                    const profileIcon = document.querySelector('.profile-icon img');
+                    profileImage.src = e.target.result;
+                    profileIcon.src = e.target.result;
+                    selectedFile = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
         }
-    }
+        input.click();
+    });
 
     function showToast(message) {
         const toast = document.createElement('div');
         toast.className = 'toast-message';
         toast.textContent = message;
         
-        // 회원탈퇴 버튼 다음에 토스트 메시지 추가
         const deleteAccountBtn = document.querySelector('.delete-account');
         deleteAccountBtn.after(toast);
     
@@ -90,55 +110,29 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
     }
 
-
     // 폼 제출 처리
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const nickname = nicknameInput.value.trim();
 
-        // 닉네임 빈값 체크
         if (!nickname) {
             nicknameError.textContent = '*닉네임을 입력해주세요.';
             nicknameError.style.display = 'block';
             return;
         }
 
-        // 닉네임 중복 체크
-        if (checkNicknameDuplicate(nickname)) {
-            nicknameError.textContent = '*중복된 닉네임입니다.';
-            nicknameError.style.display = 'block';
-            return;
-        }
-
-        // 유효성 검사 통과시 사용자 정보 업데이트
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const updatedUsers = users.map(user => {
-            if (user.email === currentUser.email) {
-                return { 
-                    ...user, 
-                    nickname: nickname,
-                    profileImage: currentUser.profileImage  
-                };
-            }
-            return user;
+        const success = await updateProfile({
+            nickname,
+            profileImage: selectedFile
         });
 
-
-        // 로컬 스토리지 업데이트
-        localStorage.setItem('users', JSON.stringify(updatedUsers));
-        localStorage.setItem('currentUser', JSON.stringify({
-            ...currentUser,
-            nickname: nickname,
-            profileImage: currentUser.profileImage
-        }));
-
-        showToast('수정 완료');
-
-   
-        setTimeout(() => {
-            window.location.href = './posts.html';
-        }, 2000);
+        if (success) {
+            showToast('수정 완료');
+            setTimeout(() => {
+                window.location.href = './posts.html';
+            }, 2000);
+        }
     });
 
     // 입력시 에러메시지 숨김
@@ -146,54 +140,42 @@ document.addEventListener('DOMContentLoaded', function() {
         nicknameError.style.display = 'none';
     });
 
-    // 로그아웃 처리
-    const logoutButton = document.querySelector('.dropdown-item:last-child');
-    logoutButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        localStorage.removeItem('currentUser');
-        window.location.href = '../index.html';
-    });
-    
-
-    // 모달 관련 요소 선택
-    const modal = document.getElementById('deleteModal');
-    const confirmBtn = modal.querySelector('.confirm-btn');
-
-    confirmBtn.addEventListener('click', function() {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        const users = JSON.parse(localStorage.getItem('users'));
-    
-    // 1. 게시글 삭제
-    const posts = JSON.parse(localStorage.getItem('posts') || '[]');
-    const updatedPosts = posts.filter(post => post.author !== currentUser.nickname);
-    localStorage.setItem('posts', JSON.stringify(updatedPosts));
-
-    // 2. 남은 게시글들의 댓글 중 사용자가 작성한 댓글 삭제
-    const updatedPostsWithoutComments = updatedPosts.map(post => {
-        if (post.comments) {
-            post.comments = post.comments.filter(comment => 
-                comment.author !== currentUser.nickname
-            );
+    // 회원탈퇴 처리
+    confirmBtn.addEventListener('click', async function() {
+        const success = await deleteUser();
+        if (success) {
+            window.location.href = '../index.html';
         }
-        return post;
     });
-    localStorage.setItem('posts', JSON.stringify(updatedPostsWithoutComments));
 
-    // 3. users 배열에서 현재 사용자 제거
-    const updatedUsers = users.filter(user => user.email !== currentUser.email);
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
-    
-    // 4. 현재 사용자 정보 삭제
-    localStorage.removeItem('currentUser');
-    
-    // 5. 로그인 페이지로 이동
-    window.location.href = '../index.html';
-});
+    // 드롭다운 메뉴 관련
+    profileIcon.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('show');
+    });
 
-// 모달 외부 클릭 시 닫기
-modal.addEventListener('click', function(e) {
-    if (e.target === modal) {
+    document.addEventListener('click', function(e) {
+        if (!profileIcon.contains(e.target)) {
+            dropdownMenu.classList.remove('show');
+        }
+    });
+
+    // 모달 관련
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.classList.remove('show');
+        }
+    });
+
+    // 회원탈퇴 버튼 클릭 이벤트 
+    const deleteAccountBtn = document.querySelector('.delete-account');
+    deleteAccountBtn.addEventListener('click', function() {
+        modal.classList.add('show');
+    });
+
+    // 모달 취소 버튼 클릭 이벤트 
+    const cancelBtn = document.querySelector('.cancel-btn');
+    cancelBtn.addEventListener('click', function() {
         modal.classList.remove('show');
-    }
-});
+    });
 });

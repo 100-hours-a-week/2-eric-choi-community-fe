@@ -1,5 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
-    displayProfileIcon();
+document.addEventListener('DOMContentLoaded', async function() {
     const form = document.getElementById('postForm');
     const titleInput = document.getElementById('title');
     const contentInput = document.getElementById('content');
@@ -11,45 +10,72 @@ document.addEventListener('DOMContentLoaded', function() {
     const dropdownMenu = document.querySelector('.dropdown-menu');
 
     let selectedFile = null;
-
-    // URL에서 게시글 ID 가져오기
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
 
-    // 기존 게시글 데이터 불러오기
-    function loadPost() {
-        if (!postId) return;
-    
-        const posts = JSON.parse(localStorage.getItem('posts') || '[]');
-        const post = posts.find(p => p.id.toString() === postId);
+    // 현재 로그인한 사용자 정보 가져오기
+    let currentUser;
+    try {
+        const userResponse = await fetch('/data/users.json');
+        const userData = await userResponse.json();
+        currentUser = userData.data;
         
-        if (post) {
-            titleInput.value = post.title;
-            contentInput.value = post.content;
-            
-            if (post.image) {
-                fileName.textContent = '기존 이미지가 있습니다.';
-            }
-    
-  
-            submitButton.disabled = false;
-            submitButton.classList.add('active');
-            contentError.style.display = 'none'; 
-            submitButton.textContent = '수정하기';
-        }
-    }
-
-    function displayProfileIcon() {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
         const profileImg = document.querySelector('.profile-icon img');
-        
         if (currentUser && currentUser.profileImage) {
             profileImg.src = currentUser.profileImage;
         }
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        window.location.href = '../index.html';
+        return;
     }
 
-    // 페이지 로드시 기존 게시글 데이터 불러오기
-    loadPost();
+    // 게시글 상세 정보 조회
+    async function fetchPostDetail() {
+        try {
+            const response = await fetch('/data/posts.json');
+            const result = await response.json();
+            const post = result.data.find(p => p.id === parseInt(postId));
+            
+            if (post) {
+                titleInput.value = post.title;
+                contentInput.value = post.content;
+                
+                if (post.image) {
+                    fileName.textContent = '기존 이미지가 있습니다.';
+                }
+        
+                submitButton.disabled = false;
+                submitButton.classList.add('active');
+                contentError.style.display = 'none'; 
+                submitButton.textContent = '수정하기';
+            }
+        } catch (error) {
+            console.error('Error fetching post:', error);
+        }
+    }
+
+    // 게시글 수정 API
+    async function updatePost(postData) {
+        try {
+            const response = await fetch(`/posts/${postId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: currentUser.id,
+                    title: postData.title,
+                    content: postData.content,
+                    image: postData.image
+                })
+            });
+            return true;
+        } catch (error) {
+            console.error('Error updating post:', error);
+            return false;
+        }
+    }
 
     // 입력 필드 유효성 검사 함수
     function validateForm() {
@@ -74,24 +100,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    titleInput.addEventListener('blur', validateForm);
-    contentInput.addEventListener('blur', validateForm);
-    titleInput.addEventListener('input', validateForm);
-    contentInput.addEventListener('input', validateForm);
+    // 이벤트 리스너들
+    titleInput.addEventListener('blur', function() {
+        this.dataset.touched = 'true';
+        validateForm();
+    });
 
-    uploadButton.addEventListener('click', function() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        
-        input.onchange = function(e) {
-            selectedFile = e.target.files[0];
-            if (selectedFile) {
-                fileName.textContent = selectedFile.name;
-            }
-        };
-        
-        input.click();
+    contentInput.addEventListener('blur', function() {
+        this.dataset.touched = 'true';
+        validateForm();
     });
 
     titleInput.addEventListener('input', function() {
@@ -107,17 +124,28 @@ document.addEventListener('DOMContentLoaded', function() {
         validateForm();
     });
 
-    form.addEventListener('submit', function(e) {
+    // 파일 업로드
+    uploadButton.addEventListener('click', function() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        
+        input.onchange = function(e) {
+            selectedFile = e.target.files[0];
+            if (selectedFile) {
+                fileName.textContent = selectedFile.name;
+            }
+        };
+        
+        input.click();
+    });
+
+    // 폼 제출
+    form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const title = titleInput.value.trim();
         const content = contentInput.value.trim();
-    
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (!currentUser) {
-            window.location.href = '../index.html';
-            return;
-        }
     
         if (!title || !content) {
             contentError.style.display = 'block';
@@ -126,40 +154,27 @@ document.addEventListener('DOMContentLoaded', function() {
     
         contentError.style.display = 'none';
 
-        // 게시글 수정 로직
-        const posts = JSON.parse(localStorage.getItem('posts') || '[]');
-        const postIndex = posts.findIndex(p => p.id.toString() === postId);
-
-        if (postIndex !== -1) {
-
-            if (selectedFile) {
+        let imageData = null;
+        if (selectedFile) {
+            imageData = await new Promise((resolve) => {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    posts[postIndex] = {
-                        ...posts[postIndex],
-                        title: title,
-                        content: content,
-                        image: e.target.result,
-                        editDate: new Date().toLocaleString()
-                    };
-                    localStorage.setItem('posts', JSON.stringify(posts));
-                    window.location.href = `./post-detail.html?id=${postId}`;
-                };
+                reader.onload = e => resolve(e.target.result);
                 reader.readAsDataURL(selectedFile);
-            } else {
+            });
+        }
 
-                posts[postIndex] = {
-                    ...posts[postIndex],
-                    title: title,
-                    content: content,
-                    editDate: new Date().toLocaleString()
-                };
-                localStorage.setItem('posts', JSON.stringify(posts));
-                window.location.href = `./post-detail.html?id=${postId}`;
-            }
+        const success = await updatePost({
+            title,
+            content,
+            image: imageData
+        });
+
+        if (success) {
+            window.location.href = `./post-detail.html?id=${postId}`;
         }
     });
 
+    // 드롭다운 메뉴
     profileIcon.addEventListener('click', function(e) {
         e.stopPropagation();
         dropdownMenu.classList.toggle('show');
@@ -176,4 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
             dropdownMenu.classList.remove('show');
         }
     });
+
+    // 초기 데이터 로드
+    await fetchPostDetail();
 });

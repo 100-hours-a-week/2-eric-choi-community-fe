@@ -6,6 +6,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordValidation = document.getElementById('password-validation');
     const submitBtn = document.getElementById('submitBtn');
 
+    // 로그인 API
+    async function login(email, password) {
+        try {
+            const response = await fetch('/users/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password })
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Error logging in:', error);
+            return null;
+        }
+    }
+
     function updateDimensions(input) {
         const dimensions = input.parentElement.querySelector('.input-dimensions');
         if (dimensions) {
@@ -48,16 +65,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 폼 제출 처리
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const email = emailInput.value;
         const password = passwordInput.value;
-    
+
         // 유효성 검사
         const isEmailValid = !emailInput.classList.contains('input-error');
         const isPasswordValid = !passwordInput.classList.contains('input-error');
-    
+
         if (!isEmailValid || !isPasswordValid) {
             if (!isEmailValid) {
                 emailValidation.classList.add('show-error');
@@ -69,23 +86,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             return;
         }
-    
-        // 로컬 스토리지에서 사용자 확인
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const user = users.find(user => user.email === email && user.password === password);
-    
-        if (user) {
-            // 로그인 성공: currentUser 저장
-            const currentUser = {
-                email: user.email,
-                nickname: user.nickname,
-                profileImage: user.profileImage
-            };
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            
+
+        const result = await login(email, password);
+        
+        if (result?.message === "login_success") {
+            localStorage.setItem('currentUser', JSON.stringify(result.data));
             window.location.href = "./pages/posts.html";
         } else {
-            // 로그인 실패
             alert('이메일 또는 비밀번호가 올바르지 않습니다.');
         }
     });

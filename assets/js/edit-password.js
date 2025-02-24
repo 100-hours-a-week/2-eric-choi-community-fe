@@ -1,5 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
-    displayProfileIcon();
+document.addEventListener('DOMContentLoaded', async function() {
     const form = document.getElementById('editForm');
     const passwordInput = document.getElementById('password');
     const passwordConfirmInput = document.getElementById('passwordConfirm');
@@ -17,6 +16,45 @@ document.addEventListener('DOMContentLoaded', function() {
         passwordConfirm: false
     };
 
+    // 현재 로그인한 사용자 정보 가져오기
+    let currentUser;
+    try {
+        const userResponse = await fetch('/data/users.json');
+        const userData = await userResponse.json();
+        currentUser = userData.data;
+        
+        // 프로필 이미지 설정
+        const profileImg = document.querySelector('.profile-icon img');
+        if (currentUser && currentUser.profileImage) {
+            profileImg.src = currentUser.profileImage;
+        }
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        window.location.href = '../index.html';
+        return;
+    }
+
+    // 비밀번호 변경 API
+    async function updatePassword(userId, password) {
+        try {
+            const response = await fetch(`/users/${userId}/password`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: userId,
+                    password: password,
+                    confirmPassword: password
+                })
+            });
+            return true;
+        } catch (error) {
+            console.error('Error updating password:', error);
+            return false;
+        }
+    }
+
     // 버튼 활성화 상태 체크 함수
     function checkFormValidity() {
         const isAllValid = Object.values(validationState).every(value => value === true);
@@ -24,35 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
         submitButton.style.opacity = isAllValid ? '1' : '0.5';
     }
 
-    function displayProfileIcon() {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        const profileImg = document.querySelector('.profile-icon img');
-        
-        if (currentUser && currentUser.profileImage) {
-            profileImg.src = currentUser.profileImage;
-        }
-    }
-
-    // 현재 로그인한 사용자 확인
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (!currentUser) {
-        window.location.href = '../index.html';
-        return;
-    }
-
-    // 드롭다운 메뉴 토글
-    profileIcon.addEventListener('click', function(e) {
-        e.stopPropagation();
-        dropdownMenu.classList.toggle('show');
-    });
-
-    // 외부 클릭시 드롭다운 메뉴 닫기
-    document.addEventListener('click', function(e) {
-        if (!profileIcon.contains(e.target)) {
-            dropdownMenu.classList.remove('show');
-        }
-    });
-
+    // 비밀번호 유효성 검사
     passwordInput.addEventListener('input', function() {
         const password = this.value;
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,20}$/;
@@ -69,12 +79,11 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.borderColor = '#ff0000';
             validationState.password = false;
         } else {
-            helperText.style.display = 'none';   /
+            helperText.style.display = 'none';
             this.style.borderColor = '#111';
             validationState.password = true;
         }
         
- 
         if (passwordConfirmInput.value) {
             passwordConfirmInput.dispatchEvent(new Event('input'));
         }
@@ -103,27 +112,28 @@ document.addEventListener('DOMContentLoaded', function() {
         checkFormValidity();
     });
 
-
-    form.addEventListener('submit', function(e) {
+    // 폼 제출
+    form.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        const newPassword = passwordInput.value;
-
-
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const updatedUsers = users.map(user => {
-            if (user.email === currentUser.email) {
-                return { ...user, password: newPassword };
-            }
-            return user;
-        });
-
- 
-        localStorage.setItem('users', JSON.stringify(updatedUsers));
-        window.location.href = './posts.html';
+        const success = await updatePassword(currentUser.id, passwordInput.value);
+        if (success) {
+            window.location.href = './posts.html';
+        }
     });
 
-    // ESC 키로 드롭다운 메뉴 닫기
+    // 드롭다운 메뉴 토글
+    profileIcon.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!profileIcon.contains(e.target)) {
+            dropdownMenu.classList.remove('show');
+        }
+    });
+
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             dropdownMenu.classList.remove('show');

@@ -20,6 +20,55 @@ document.addEventListener('DOMContentLoaded', function() {
         nickname: false
     };
 
+    // API 호출 함수 추가
+    async function registerUser(userData) {
+        try {
+            const response = await fetch('/users/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData)
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Error registering user:', error);
+            return null;
+        }
+    }
+
+// 이메일 중복 체크 API
+    async function checkEmailDuplicate(email) {
+        try {
+            const response = await fetch('/data/users.json');
+            const result = await response.json();
+            const isDuplicate = result.data.some(user => user.email === email);
+            return {
+                message: "email_check_success",
+                data: isDuplicate
+            };
+        } catch (error) {
+            console.error('Error checking email:', error);
+            return null;
+        }
+    }
+
+    // 닉네임 중복 체크 API
+    async function checkNicknameDuplicate(nickname) {
+        try {
+            const response = await fetch('/data/users.json');
+            const result = await response.json();
+            const isDuplicate = result.data.some(user => user.nickname === nickname);
+            return {
+                message: "nickname_check_success",
+                data: isDuplicate
+            };
+        } catch (error) {
+            console.error('Error checking nickname:', error);
+            return null;
+        }
+    }
+
     // 버튼 활성화 상태 체크 함수
     function checkFormValidity() {
         const isAllValid = Object.values(validationState).every(value => value === true);
@@ -162,40 +211,38 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 폼 제출 처리
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', async function(e) {
         e.preventDefault();
-    
+
         // 이메일 중복 체크
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        if (users.some(user => user.email === emailInput.value)) {
+        const emailCheck = await checkEmailDuplicate(emailInput.value);
+        if (emailCheck?.data) {
             const helperText = emailInput.parentElement.querySelector('.helper-text');
             helperText.textContent = '*이미 사용 중인 이메일입니다.';
             helperText.style.display = 'block';
             emailInput.style.borderColor = '#ff0000';
             return;
         }
-    
+
         // 닉네임 중복 체크
-        if (users.some(user => user.nickname === nicknameInput.value)) {
+        const nicknameCheck = await checkNicknameDuplicate(nicknameInput.value);
+        if (nicknameCheck?.data) {
             const helperText = nicknameInput.parentElement.querySelector('.helper-text');
             helperText.textContent = '*이미 사용 중인 닉네임입니다.';
             helperText.style.display = 'block';
             nicknameInput.style.borderColor = '#ff0000';
             return;
         }
-    
-        // 새로운 사용자 객체 생성
-        const newUser = {
+
+        const result = await registerUser({
             email: emailInput.value,
             password: passwordInput.value,
             nickname: nicknameInput.value,
             profileImage: profileImageUrl
-        };
-    
-        // 사용자 추가
-        users.push(newUser);
-        localStorage.setItem('users', JSON.stringify(users));
-    
-        window.location.href = '../index.html';
+        });
+
+        if (result?.message === "register_success") {
+            window.location.href = '../index.html';
+        }
     });
 });
