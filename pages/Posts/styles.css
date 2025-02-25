@@ -1,0 +1,252 @@
+
+.board-intro {
+    max-width: 800px;
+    margin: 3rem auto 2rem;
+    padding: 0 var(--spacing-sm, 1rem);
+}
+
+.board-intro h2 {
+    font-size: var(--text-xl, 1.25rem);
+    color: var(--text-primary, #333);
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.board-intro p {
+    font-size: var(--text-xl, 1.25rem);
+    color: var(--text-primary, #333);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.board-intro strong {
+    color: var(--text-primary, #333);
+}
+
+.posts-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-sm);
+}
+
+.top-section {
+    padding: var(--spacing-sm) 0;
+    text-align: right;
+}
+
+.write-button {
+    background-color: var(--primary-light);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.write-button:hover {
+    background-color: var(--primary);
+}
+
+/* 게시글 목록 스타일 */
+.post-list {
+    margin-top: var(--spacing-sm);
+}
+
+.post-item {
+    background-color: white;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+}
+
+.post-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.post-title {
+    font-size: var(--text-lg);
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.post-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.post-stats {
+    display: flex;
+    gap: var(--spacing-sm);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+}
+
+.post-date {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+}
+
+.post-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: var(--spacing-sm) 0;
+}
+
+.post-author {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+}
+
+.author-img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.author-name {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+}
+
+/* 게시글 상세 스타일 */
+.post-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--spacing-lg) var(--spacing-sm);
+}
+
+.post-header {
+    margin-bottom: var(--spacing-md);
+}
+
+.post-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.post-actions button {
+    padding: 4px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: white;
+    color: var(--text-primary);
+    font-size: var(--text-xs);
+    cursor: pointer;
+}
+
+.post-content {
+    margin: var(--spacing-lg) 0;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.post-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+    margin: var(--spacing-md) 0;
+}
+
+.post-stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: var(--spacing-md) 0;
+}
+
+.stat-box {
+    background-color: #d9d9d9;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    text-align: center;
+    min-width: 100px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.stat-box:hover {
+    background-color: #c4c4c4;
+}
+
+.stat-value {
+    font-size: var(--text-base);
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    font-weight: bold;
+}
+
+/* 댓글 영역 스타일 */
+.comments-title {
+    font-size: var(--text-lg);
+    margin: var(--spacing-md) 0;
+}
+
+.comment-form {
+    position: relative;
+    margin: var(--spacing-sm) 0 var(--spacing-md);
+}
+
+.comment-form textarea {
+    width: 100%;
+    min-height: 169px;
+    padding: 12px;
+    padding-bottom: 60px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    resize: none;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word; 
+    line-height: 1.5;
+}
+
+.comment-form button {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 138px;
+    height: 39px;
+    padding: 8px 16px;
+    background-color: var(--primary-light);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.comment-form button:not(:disabled):hover {
+    background-color: var(--primary);
+}
+
+.comment-form button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.comments-list {
+    margin-top: var(--spacing-md);
+}
+
+.comment-item {
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--border-color);
+}

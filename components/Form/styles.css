@@ -1,0 +1,94 @@
+/* 폼 스타일 */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs, 0.5rem);
+    margin-bottom: var(--spacing-md, 1.5rem);
+}
+
+.input-group label {
+    font-weight: bold;
+    color: var(--text-primary, #333);
+}
+
+.input-group input,
+.input-group textarea {
+    padding: var(--spacing-sm, 0.75rem);
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: var(--radius-sm, 4px);
+    font-size: var(--text-base, 1rem);
+    transition: border-color 0.2s;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+    outline: none;
+    border-color: var(--primary, #7F6AEE);
+}
+
+.input-group textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.input-group .required {
+    color: var(--error, #ff0000);
+    margin-left: 4px;
+}
+
+.input-group .helper-text {
+    font-size: var(--text-xs, 0.75rem);
+    color: var(--error, #ff0000);
+    display: none;
+}
+
+.input-group.error input,
+.input-group.error textarea {
+    border-color: var(--error, #ff0000);
+}
+
+
+.image-upload {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, 1rem);
+}
+
+.upload-button {
+    padding: var(--spacing-xs, 0.5rem) var(--spacing-sm, 1rem);
+    background-color: #eee;
+    border-radius: var(--radius-sm, 4px);
+    cursor: pointer;
+    border: none;
+}
+
+.upload-button:hover {
+    background-color: #ddd;
+}
+
+.file-name {
+    color: var(--text-secondary, #666);
+    font-size: var(--text-sm, 0.875rem);
+}
+
+.submit-button {
+    padding: var(--spacing-sm, 1rem);
+    background-color: var(--primary-light, #ACA0EB);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm, 4px);
+    font-size: var(--text-base, 1rem);
+    cursor: pointer;
+    margin-top: var(--spacing-sm, 1rem);
+    transition: all 0.3s ease;
+}
+
+.submit-button.active {
+    background-color: var(--primary, #7F6AEE);
+    opacity: 1;
+}
+
+.submit-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
