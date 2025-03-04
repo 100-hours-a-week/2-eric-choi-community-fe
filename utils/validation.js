@@ -1,3 +1,4 @@
+// validation.js에 추가할 내용
 export const validators = {
     email: (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -36,5 +37,28 @@ export const validators = {
     content: (content) => {
         if (!content) return '내용을 입력해주세요.';
         return null;
+    },
+    
+    // 폼 유효성 검사 - 게시글 작성/수정에 사용할 수 있는 유틸리티 함수
+    validatePostForm: (titleInput, contentInput, submitButton, contentError) => {
+        const isTitleValid = titleInput.value.trim() !== '';
+        const isContentValid = contentInput.value.trim() !== '';
+        const isFormValid = isTitleValid && isContentValid;
+        
+        submitButton.disabled = !isFormValid;
+        
+        if (!isFormValid && (titleInput.dataset.touched === 'true' || contentInput.dataset.touched === 'true')) {
+            contentError.style.display = 'block';
+        } else {
+            contentError.style.display = 'none';
+        }
+        
+        if (isFormValid) {
+            submitButton.classList.add('active');
+        } else {
+            submitButton.classList.remove('active');
+        }
+        
+        return isFormValid;
     }
 };

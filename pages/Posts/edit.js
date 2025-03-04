@@ -3,29 +3,21 @@ import { Api } from '../../utils/api.js';
 import { validators } from '../../utils/validation.js';
 import { helpers } from '../../utils/helpers.js';
 
-class PostEdit {
+class PostCreate {
     constructor() {
         this.header = new Header({ 
-            title: '게시글 수정',
+            title: '게시글 작성',
             showBackButton: true
         });
         
-        this.postId = new URLSearchParams(window.location.search).get('id');
         this.currentUser = null;
         this.selectedFile = null;
-        this.post = null;
         
         this.init();
     }
     
     async init() {
-        if (!this.postId) {
-            window.location.href = 'posts.html';
-            return;
-        }
-        
         await this.loadUserData();
-        await this.loadPostData();
         this.setupElements();
         this.setupEventListeners();
     }
@@ -45,27 +37,6 @@ class PostEdit {
         }
     }
     
-    async loadPostData() {
-        try {
-            const response = await Api.get(`/posts/${this.postId}`);
-            this.post = response.data;
-            
-            if (!this.post) {
-                window.location.href = 'posts.html';
-                return;
-            }
-            
-            // 작성자만 수정 가능
-            if (this.post.author.id !== this.currentUser.id) {
-                window.location.href = `post-detail.html?id=${this.postId}`;
-                return;
-            }
-        } catch (error) {
-            console.error('Failed to load post:', error);
-            window.location.href = 'posts.html';
-        }
-    }
-    
     setupElements() {
         this.form = document.getElementById('postForm');
         this.titleInput = document.getElementById('title');
@@ -75,17 +46,8 @@ class PostEdit {
         this.submitButton = document.querySelector('.submit-button');
         this.contentError = document.getElementById('contentError');
         
-        // 폼에 게시글 데이터 설정
-        this.titleInput.value = this.post.title;
-        this.contentInput.value = this.post.content;
-        
-        if (this.post.image) {
-            this.fileName.textContent = '기존 이미지가 있습니다.';
-        }
-        
-        this.submitButton.disabled = false;
-        this.submitButton.classList.add('active');
-        this.contentError.style.display = 'none';
+        this.submitButton.disabled = true;
+        this.submitButton.classList.remove('active');
     }
     
     setupEventListeners() {
@@ -96,13 +58,13 @@ class PostEdit {
         });
         
         this.titleInput.addEventListener('input', () => {
-            this.titleInput.dataset.touched = 'true';
+            if (this.titleInput.dataset.touched === 'true') {
+                this.validateForm();
+            }
             
             if (this.titleInput.value.length > 26) {
                 this.titleInput.value = this.titleInput.value.substring(0, 26);
             }
-            
-            this.validateForm();
         });
         
         // 내용 입력 이벤트
@@ -112,8 +74,9 @@ class PostEdit {
         });
         
         this.contentInput.addEventListener('input', () => {
-            this.contentInput.dataset.touched = 'true';
-            this.validateForm();
+            if (this.contentInput.dataset.touched === 'true') {
+                this.validateForm();
+            }
         });
         
         // 파일 업로드 이벤트
@@ -124,25 +87,12 @@ class PostEdit {
     }
     
     validateForm() {
-        const isTitleValid = this.titleInput.value.trim() !== '';
-        const isContentValid = this.contentInput.value.trim() !== '';
-        const isFormValid = isTitleValid && isContentValid;
-        
-        this.submitButton.disabled = !isFormValid;
-        
-        if (this.titleInput.value.trim() === '' || this.contentInput.value.trim() === '') {
-            if (this.titleInput.dataset.touched === 'true' || this.contentInput.dataset.touched === 'true') {
-                this.contentError.style.display = 'block';
-            }
-        } else {
-            this.contentError.style.display = 'none';
-        }
-        
-        if (isFormValid) {
-            this.submitButton.classList.add('active');
-        } else {
-            this.submitButton.classList.remove('active');
-        }
+        return validators.validatePostForm(
+            this.titleInput, 
+            this.contentInput, 
+            this.submitButton, 
+            this.contentError
+        );
     }
     
     handleFileUpload() {
@@ -166,12 +116,9 @@ class PostEdit {
         const title = this.titleInput.value.trim();
         const content = this.contentInput.value.trim();
         
-        if (!title || !content) {
-            this.contentError.style.display = 'block';
+        if (!this.validateForm()) {
             return;
         }
-        
-        this.contentError.style.display = 'none';
         
         let imageData = null;
         if (this.selectedFile) {
@@ -179,23 +126,23 @@ class PostEdit {
         }
         
         try {
-            const success = await Api.patch(`/posts/${this.postId}`, {
+            const result = await Api.post('/posts', {
                 userId: this.currentUser.id,
                 title,
                 content,
-                image: imageData || this.post.image
+                image: imageData
             });
             
-            if (success) {
-                window.location.href = `post-detail.html?id=${this.postId}`;
+            if (result) {
+                window.location.href = 'posts.html';
             }
         } catch (error) {
-            console.error('Failed to update post:', error);
+            console.error('Failed to create post:', error);
         }
     }
 }
 
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', () => {
-    new PostEdit();
+    new PostCreate();
 });

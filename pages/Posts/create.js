@@ -87,23 +87,12 @@ class PostCreate {
     }
     
     validateForm() {
-        const isTitleValid = this.titleInput.value.trim() !== '';
-        const isContentValid = this.contentInput.value.trim() !== '';
-        const isFormValid = isTitleValid && isContentValid;
-        
-        this.submitButton.disabled = !isFormValid;
-        
-        if (!isFormValid && (this.titleInput.dataset.touched === 'true' || this.contentInput.dataset.touched === 'true')) {
-            this.contentError.style.display = 'block';
-        } else {
-            this.contentError.style.display = 'none';
-        }
-        
-        if (isFormValid) {
-            this.submitButton.classList.add('active');
-        } else {
-            this.submitButton.classList.remove('active');
-        }
+        return validators.validatePostForm(
+            this.titleInput, 
+            this.contentInput, 
+            this.submitButton, 
+            this.contentError
+        );
     }
     
     handleFileUpload() {
@@ -127,12 +116,9 @@ class PostCreate {
         const title = this.titleInput.value.trim();
         const content = this.contentInput.value.trim();
         
-        if (!title || !content) {
-            this.contentError.style.display = 'block';
+        if (!this.validateForm()) {
             return;
         }
-        
-        this.contentError.style.display = 'none';
         
         let imageData = null;
         if (this.selectedFile) {

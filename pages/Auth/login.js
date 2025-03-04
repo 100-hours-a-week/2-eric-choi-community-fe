@@ -38,11 +38,12 @@ class Login {
     
     validateEmail() {
         const email = this.emailInput.value;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const errorMessage = validators.email(email);
         
-        if (!email || !emailRegex.test(email)) {
+        if (errorMessage) {
             this.emailValidation.classList.add('show-error');
             this.emailInput.classList.add('input-error');
+            this.emailValidation.textContent = errorMessage;
         } else {
             this.emailValidation.classList.remove('show-error');
             this.emailInput.classList.remove('input-error');
@@ -51,11 +52,12 @@ class Login {
     
     validatePassword() {
         const password = this.passwordInput.value;
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,20}$/;
+        const errorMessage = validators.password(password);
         
-        if (!password || !passwordRegex.test(password)) {
+        if (errorMessage) {
             this.passwordValidation.classList.add('show-error');
             this.passwordInput.classList.add('input-error');
+            this.passwordValidation.textContent = errorMessage;
         } else {
             this.passwordValidation.classList.remove('show-error');
             this.passwordInput.classList.remove('input-error');
@@ -85,7 +87,7 @@ class Login {
         }
 
         try {
-            const result = await Api.post('/users/login', { email, password });
+            const result = await Api.post('/users/auth', { email, password });
             
             if (result?.message === "login_success") {
                 localStorage.setItem('currentUser', JSON.stringify(result.data));

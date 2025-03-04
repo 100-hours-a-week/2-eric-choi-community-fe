@@ -60,10 +60,6 @@ export class Api {
         return this.request(endpoint);
     }
 
-    static async get(endpoint) {
-        return this.request(endpoint);
-    }
-
     static async post(endpoint, data) {
         return this.request(endpoint, {
             method: 'POST',
