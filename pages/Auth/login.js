@@ -90,6 +90,7 @@ class Login {
             const result = await Api.post('/users/auth', { email, password });
             
             if (result?.message === "login_success") {
+                // 로그인 성공 시 사용자 정보 저장
                 localStorage.setItem('currentUser', JSON.stringify(result.data));
                 window.location.href = "posts.html";
             } else {

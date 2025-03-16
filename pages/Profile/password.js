@@ -7,7 +7,7 @@ class PasswordEdit {
     constructor() {
         this.header = new Header({ 
             title: '비밀번호 수정',
-            showBackButton: false
+            showBackButton: true
         });
         
         this.currentUser = null;
@@ -27,13 +27,14 @@ class PasswordEdit {
     
     async loadUserData() {
         try {
-            const userData = await Api.get('/users');
-            this.currentUser = userData.data;
-            
-            if (!this.currentUser) {
+            // localStorage에서 사용자 정보 가져오기
+            const userJson = localStorage.getItem('currentUser');
+            if (!userJson) {
                 window.location.href = 'index.html';
                 return;
             }
+            
+            this.currentUser = JSON.parse(userJson);
         } catch (error) {
             console.error('Failed to load user data:', error);
             window.location.href = 'index.html';
@@ -118,7 +119,7 @@ class PasswordEdit {
             const success = await Api.patch(`/users/${this.currentUser.id}/password`, {
                 userId: this.currentUser.id,
                 password: this.passwordInput.value,
-                confirmPassword: this.passwordInput.value
+                confirmPassword: this.passwordConfirmInput.value  // 수정된 부분
             });
             
             if (success) {

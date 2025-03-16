@@ -33,13 +33,14 @@ class PostDetail {
     
     async loadUserData() {
         try {
-            const userData = await Api.get('/users');
-            this.currentUser = userData.data;
-            
-            if (!this.currentUser) {
+            // localStorage에서 사용자 정보 가져오기
+            const userJson = localStorage.getItem('currentUser');
+            if (!userJson) {
                 window.location.href = 'index.html';
                 return;
             }
+            
+            this.currentUser = JSON.parse(userJson);
         } catch (error) {
             console.error('Failed to load user data:', error);
             window.location.href = 'index.html';
@@ -88,7 +89,8 @@ class PostDetail {
         
         // 수정/삭제 버튼
         this.editBtn?.addEventListener('click', () => {
-            window.location.href = `edit-post.html?id=${this.postId}`;
+            const encodedEmail = encodeURIComponent(this.currentUser.email);
+            window.location.href = `edit-post.html?id=${this.postId}&email=${encodedEmail}`;
         });
         
         this.deleteBtn?.addEventListener('click', this.handlePostDelete.bind(this));
@@ -96,26 +98,17 @@ class PostDetail {
     
     async loadPostData() {
         try {
-            console.log('게시글 데이터 로드 시도, ID:', this.postId);
-            const response = await Api.get(`/posts/${this.postId}`);
-            console.log('로드된 게시글 데이터:', response);
+            // 게시글 데이터 로드
+            const response = await Api.get(`/posts/${this.postId}?email=${encodeURIComponent(this.currentUser.email)}`);
             this.post = response.data;
             
-            if (!this.post) {
-                console.error('게시글을 찾을 수 없음');
-                alert('게시글을 찾을 수 없습니다.');
-                window.location.href = 'posts.html';
-                return;
-            }
+            // 좋아요 상태 별도 확인
+            const likeStatus = await Api.get(`/posts/${this.postId}/likes/status?email=${encodeURIComponent(this.currentUser.email)}`);
+            this.isLiked = likeStatus.data.data; // API 응답 구조에 맞게 조정
             
             this.displayPost();
         } catch (error) {
             console.error('게시글 로드 실패:', error);
-            alert('게시글을 불러오는 중 오류가 발생했습니다.');
-            // 바로 리디렉션하지 말고 사용자에게 알림 후 리디렉션
-            setTimeout(() => {
-                window.location.href = 'posts.html';
-            }, 1000);
         }
     }
     
@@ -124,7 +117,7 @@ class PostDetail {
         
         this.postTitle.textContent = post.title;
         this.authorInfo.innerHTML = `
-            <img src="${post.author.profileImageUrl}" alt="작성자 프로필" class="author-img">
+            <img src="${post.author.profileImage}" alt="작성자 프로필" class="author-img">
             <span class="author-name">${post.author.nickname}</span>
             <span class="post-date">${post.createdAt}</span>
         `;
@@ -167,13 +160,13 @@ class PostDetail {
             commentElement.className = 'comment-item';
             commentElement.innerHTML = `
                 <div class="comment-author">
-                    <img src="${comment.author.profileImageUrl}" alt="작성자 프로필" class="author-img">
+                    <img src="${comment.author.profileImage}" alt="작성자 프로필" class="author-img">
                     <span>${comment.author.nickname}</span>
                     <span class="comment-date">${comment.createdAt}</span>
                     ${comment.author.nickname === this.currentUser.nickname ? `
                         <div class="comment-actions">
-                            <button class="edit-comment" data-id="${comment.id}">수정</button>
-                            <button class="delete-comment" data-id="${comment.id}">삭제</button>
+                            <button class="edit-comment" data-id="${comment.commentId}">수정</button>
+                            <button class="delete-comment" data-id="${comment.commentId}">삭제</button>
                         </div>
                     ` : ''}
                 </div>
@@ -187,15 +180,30 @@ class PostDetail {
         const statBox = e.target.closest('.stat-box');
         if (statBox && statBox.querySelector('.stat-label').textContent === '좋아요수') {
             try {
-                const success = await Api.patch(`/posts/${this.postId}/likes`, {
-                    userId: this.currentUser.id
-                });
+                let success;
+                const emailParam = '?email=' + encodeURIComponent(this.currentUser.email);
+                
+                if (this.isLiked) {
+                    // 좋아요 취소: DELETE 요청 - 요청 본문 필요 없음
+                    success = await Api.delete(`/posts/${this.postId}/likes${emailParam}`);
+                    this.isLiked = false;
+                } else {
+                    // 좋아요 추가: POST 요청 - 요청 본문에 postId 필요
+                    success = await Api.post(`/posts/${this.postId}/likes${emailParam}`, {
+                        postId: parseInt(this.postId)
+                    });
+                    this.isLiked = true;
+                }
                 
                 if (success) {
                     await this.loadPostData();
                 }
             } catch (error) {
                 console.error('Failed to toggle like:', error);
+                // 오류 메시지 표시 (선택 사항)
+                if (error.message && error.message.includes('Unauthorized')) {
+                    console.log('이미 처리된 요청이거나 권한이 없습니다.');
+                }
             }
         }
     }
@@ -205,45 +213,47 @@ class PostDetail {
         
         const content = this.commentInput.value.trim();
         if (!content) return;
-        
+    
+        const emailParam = '?email=' + encodeURIComponent(this.currentUser.email);
+    
         try {
+            let success;  // 미리 선언
+    
+            // 수정 모드라면 PATCH 요청
             if (this.isEditingComment) {
-                const success = await Api.patch(`/posts/${this.postId}/comments/${this.editingCommentId}`, {
+                // PATCH 요청
+                success = await Api.patch(`/posts/${this.postId}/comments/${this.editingCommentId}` + emailParam, {
                     userId: this.currentUser.id,
                     content
                 });
-                
-                if (success) {
-                    this.isEditingComment = false;
-                    this.editingCommentId = null;
-                    this.commentButton.textContent = '댓글 등록';
-                    this.commentInput.value = '';
-                    this.commentButton.style.backgroundColor = 'var(--primary-light)';
-                    this.commentButton.disabled = true;
-                    await this.loadPostData();
-                }
             } else {
-                const success = await Api.post(`/posts/${this.postId}/comments`, {
+                // POST 요청
+                success = await Api.post(`/posts/${this.postId}/comments` + emailParam, {
                     userId: this.currentUser.id,
                     content
                 });
-                
-                if (success) {
-                    this.commentInput.value = '';
-                    this.commentButton.style.backgroundColor = 'var(--primary-light)';
-                    this.commentButton.disabled = true;
-                    await this.loadPostData();
-                }
+            }
+    
+            if (success) {
+                // 공통 후처리
+                this.isEditingComment = false;
+                this.editingCommentId = null;
+                this.commentButton.textContent = '댓글 등록';
+                this.commentInput.value = '';
+                this.commentButton.style.backgroundColor = 'var(--primary-light)';
+                this.commentButton.disabled = true;
+                await this.loadPostData();
             }
         } catch (error) {
             console.error('Failed to submit comment:', error);
         }
     }
     
+    
     handleCommentActions(e) {
         if (e.target.classList.contains('edit-comment')) {
             const commentId = parseInt(e.target.dataset.id);
-            const comment = this.post.comments.find(c => c.id === commentId);
+            const comment = this.post.comments.find(c => c.commentId === commentId);
             
             if (comment) {
                 this.commentInput.value = comment.content;
@@ -255,6 +265,7 @@ class PostDetail {
             }
         }
         
+        
         if (e.target.classList.contains('delete-comment')) {
             const commentId = parseInt(e.target.dataset.id);
             this.showDeleteCommentModal(commentId);
@@ -262,6 +273,7 @@ class PostDetail {
     }
     
     async showDeleteCommentModal(commentId) {
+        const emailParam = '?email=' + encodeURIComponent(this.currentUser.email);
         const modal = new Modal({
             title: '댓글을 삭제하시겠습니까?',
             message: '삭제한 내용은 복구할 수 없습니다.'
@@ -271,7 +283,7 @@ class PostDetail {
         
         modal.onConfirm(async () => {
             try {
-                const success = await Api.delete(`/posts/${this.postId}/comments/${commentId}`, {
+                const success = await Api.delete(`/posts/${this.postId}/comments/${commentId}` + emailParam, {
                     userId: this.currentUser.id
                 });
                 
@@ -291,6 +303,7 @@ class PostDetail {
     }
     
     async handlePostDelete() {
+        const emailParam = '?email=' + encodeURIComponent(this.currentUser.email);
         const modal = new Modal({
             title: '게시글을 삭제하시겠습니까?',
             message: '삭제한 내용은 복구할 수 없습니다.'
@@ -300,7 +313,7 @@ class PostDetail {
         
         modal.onConfirm(async () => {
             try {
-                const success = await Api.delete(`/posts/${this.postId}`, {
+                const success = await Api.delete(`/posts/${this.postId}` + emailParam, {
                     userId: this.currentUser.id
                 });
                 

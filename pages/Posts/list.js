@@ -9,8 +9,8 @@ class PostsList {
         });
         
         this.state = {
-            page: 1,
-            limit: 5,
+            cursor: null, // 커서를 null로 초기화
+            pageSize: 5,
             loading: false,
             hasMore: true
         };
@@ -50,15 +50,27 @@ class PostsList {
         this.state.loading = true;
         
         try {
-            const response = await Api.get(`/posts?page=${this.state.page}&limit=${this.state.limit}`);
-            const posts = response.data;
+            // 첫 페이지 요청 시 cursor가 null이면 쿼리 스트링에서 제외
+            const url = this.state.cursor 
+                ? `/posts?cursor=${this.state.cursor}&pageSize=${this.state.pageSize}` 
+                : `/posts?pageSize=${this.state.pageSize}`;
             
-            // 더 이상 불러올 게시글이 없는지 확인
-            this.state.hasMore = posts.length === this.state.limit;
+            const response = await Api.get(url);
+            console.log('API response:', response.data);
             
-            // 게시글 렌더링
-            if (posts && posts.length > 0) {
+            const posts = response.data.postSimpleInfos;
+            
+            if (!posts || !Array.isArray(posts)) {
+                console.error('게시글 배열이 존재하지 않습니다.');
+                this.state.hasMore = false;
+                return;
+            }
+            
+            if (posts.length > 0) {
                 this.renderPosts(posts);
+                // 다음 페이지 요청을 위해 nextCursor 업데이트
+                this.state.cursor = response.data.nextCursor;
+                this.state.hasMore = response.data.nextCursor !== null;
             } else {
                 this.state.hasMore = false;
             }
@@ -68,6 +80,9 @@ class PostsList {
             this.state.loading = false;
         }
     }
+    
+    
+    
 
     renderPosts(posts) {
         const postsHTML = posts.map(post => this.createPostElement(post)).join('');
@@ -76,7 +91,7 @@ class PostsList {
 
     createPostElement(post) {
         return `
-            <article class="post-item" data-post-id="${post.id}">
+            <article class="post-item" data-post-id="${post.postId}">
                 <h2 class="post-title">${post.title}</h2>
                 <div class="post-info">
                     <div class="post-stats">
@@ -88,12 +103,13 @@ class PostsList {
                 </div>
                 <div class="post-divider"></div>
                 <div class="post-author">
-                    <img src="${post.author.profileImageUrl}" alt="작성자 프로필" class="author-img">
-                    <span class="author-name">${post.author.nickname}</span>
+                    <img src="${post.authorProfileImg}" alt="작성자 프로필" class="author-img">
+                    <span class="author-name">${post.authorNickname}</span>
                 </div>
             </article>
         `;
     }
+    
 
     setupInfiniteScroll() {
         const options = {

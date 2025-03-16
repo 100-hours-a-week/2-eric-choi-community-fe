@@ -8,7 +8,7 @@ class ProfileEdit {
     constructor() {
         this.header = new Header({ 
             title: '회원정보 수정',
-            showBackButton: false
+            showBackButton: true
         });
         
         this.currentUser = null;
@@ -25,13 +25,14 @@ class ProfileEdit {
     
     async loadUserData() {
         try {
-            const userData = await Api.get('/users');
-            this.currentUser = userData.data;
-            
-            if (!this.currentUser) {
+            // localStorage에서 사용자 정보 가져오기
+            const userJson = localStorage.getItem('currentUser');
+            if (!userJson) {
                 window.location.href = 'index.html';
                 return;
             }
+            
+            this.currentUser = JSON.parse(userJson);
         } catch (error) {
             console.error('Failed to load user data:', error);
             window.location.href = 'index.html';
@@ -107,13 +108,19 @@ class ProfileEdit {
         }
         
         try {
-            const success = await Api.patch(`/users/${this.currentUser.id}/profile`, {
+            // 필드명 수정 (profile_image -> profileImage)
+            const success = await Api.patch(`/users/${this.currentUser.id}`, {
                 userId: this.currentUser.id,
-                nickname,
-                profile_image: this.selectedFile || this.currentUser.profileImage
+                nickname: nickname,
+                profileImage: this.selectedFile || this.currentUser.profileImage
             });
             
             if (success) {
+                // 로컬 스토리지의 사용자 정보도 업데이트
+                this.currentUser.nickname = nickname;
+                this.currentUser.profileImage = this.selectedFile || this.currentUser.profileImage;
+                localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+                
                 helpers.showToast('수정 완료');
                 setTimeout(() => {
                     window.location.href = 'posts.html';

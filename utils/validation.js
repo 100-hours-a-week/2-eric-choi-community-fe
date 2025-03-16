@@ -1,4 +1,3 @@
-// validation.js에 추가할 내용
 export const validators = {
     email: (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -60,5 +59,24 @@ export const validators = {
         }
         
         return isFormValid;
+    },
+
+    applyValidation: (inputElement, validatorFn, args = []) => {
+        const value = inputElement.value;
+        // helper-text나 validation-message 클래스를 모두 선택
+        const helperText = inputElement.parentElement.querySelector('.helper-text, .validation-message');
+        const errorMessage = validatorFn(value, ...args);
+
+        if (errorMessage) {
+            helperText.textContent = errorMessage;
+            helperText.classList.add('show-error');
+            inputElement.classList.add('input-error');
+            return false;
+        } else {
+            helperText.textContent = '';
+            helperText.classList.remove('show-error');
+            inputElement.classList.remove('input-error');
+            return true;
+        }
     }
 };
