@@ -25,14 +25,14 @@ class ProfileEdit {
     
     async loadUserData() {
         try {
-            // localStorage에서 사용자 정보 가져오기
-            const userJson = localStorage.getItem('currentUser');
-            if (!userJson) {
+            // 서버에서 사용자 정보 가져오기
+            const response = await Api.get('/users/me');
+            if (!response.data) {
                 window.location.href = 'index.html';
                 return;
             }
             
-            this.currentUser = JSON.parse(userJson);
+            this.currentUser = response.data;
         } catch (error) {
             console.error('Failed to load user data:', error);
             window.location.href = 'index.html';
@@ -108,7 +108,6 @@ class ProfileEdit {
         }
         
         try {
-            // 필드명 수정 (profile_image -> profileImage)
             const success = await Api.patch(`/users/${this.currentUser.id}`, {
                 userId: this.currentUser.id,
                 nickname: nickname,
@@ -116,11 +115,6 @@ class ProfileEdit {
             });
             
             if (success) {
-                // 로컬 스토리지의 사용자 정보도 업데이트
-                this.currentUser.nickname = nickname;
-                this.currentUser.profileImage = this.selectedFile || this.currentUser.profileImage;
-                localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
-                
                 helpers.showToast('수정 완료');
                 setTimeout(() => {
                     window.location.href = 'posts.html';

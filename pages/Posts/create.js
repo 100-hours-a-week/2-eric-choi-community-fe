@@ -24,14 +24,14 @@ class PostCreate {
     
     async loadUserData() {
         try {
-            // localStorage에서 사용자 정보 가져오기
-            const userJson = localStorage.getItem('currentUser');
-            if (!userJson) {
+            // 서버에서 사용자 정보 가져오기
+            const response = await Api.get('/users/me');
+            if (!response.data) {
                 window.location.href = 'index.html';
                 return;
             }
             
-            this.currentUser = JSON.parse(userJson);
+            this.currentUser = response.data;
         } catch (error) {
             console.error('Failed to load user data:', error);
             window.location.href = 'index.html';
@@ -127,7 +127,6 @@ class PostCreate {
         }
         
         const requestData = {
-            userId: this.currentUser.id,
             title,
             content,
             image: imageData
@@ -139,9 +138,8 @@ class PostCreate {
         });
         
         try {
-            // 이메일을 쿼리 스트링에 추가하여 API 호출
-            const emailParam = '?email=' + encodeURIComponent(this.currentUser.email);
-            const result = await Api.post('/posts' + emailParam, requestData);
+            // 세션 인증 사용하므로 이메일 파라미터 제거
+            const result = await Api.post('/posts', requestData);
             
             if (result) {
                 window.location.href = 'posts.html';

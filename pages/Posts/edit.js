@@ -11,7 +11,7 @@ class PostEdit {
         });
         
         this.postId = new URLSearchParams(window.location.search).get('id');
-        this.email = new URLSearchParams(window.location.search).get('email');
+        // 이메일 파라미터 제거
         this.currentUser = null;
         this.post = null;
         this.selectedFile = null;
@@ -20,7 +20,7 @@ class PostEdit {
     }
     
     async init() {
-        if (!this.postId || !this.email) {
+        if (!this.postId) {
             alert('게시글 정보가 올바르지 않습니다.');
             window.location.href = 'posts.html';
             return;
@@ -34,21 +34,14 @@ class PostEdit {
     
     async loadUserData() {
         try {
-            // localStorage에서 사용자 정보 가져오기
-            const userJson = localStorage.getItem('currentUser');
-            if (!userJson) {
+            // 서버에서 현재 로그인된 사용자 정보 조회
+            const response = await Api.get('/users/me');
+            if (!response.data) {
                 window.location.href = 'index.html';
                 return;
             }
             
-            this.currentUser = JSON.parse(userJson);
-            
-            // 이메일 파라미터와 로컬 저장소의 이메일이 일치하는지 확인
-            if (this.currentUser.email !== this.email) {
-                console.error('인증 정보 불일치');
-                window.location.href = 'index.html';
-                return;
-            }
+            this.currentUser = response.data;
         } catch (error) {
             console.error('Failed to load user data:', error);
             window.location.href = 'index.html';
@@ -57,8 +50,8 @@ class PostEdit {
     
     async loadPostData() {
         try {
-            // 이메일 파라미터를 포함하여 게시글 데이터 로드
-            const response = await Api.get(`/posts/${this.postId}?email=${encodeURIComponent(this.email)}`);
+            // 이메일 파라미터 제거 - 세션 기반 인증 사용
+            const response = await Api.get(`/posts/${this.postId}?incrementView=false`);
             this.post = response.data;
             
             if (!this.post) {
@@ -183,9 +176,8 @@ class PostEdit {
         }
         
         try {
-            // PATCH 요청으로 게시글 수정
-            const emailParam = `?email=${encodeURIComponent(this.email)}`;
-            const result = await Api.patch(`/posts/${this.postId}${emailParam}`, {
+            // 이메일 파라미터 제거 - 세션 기반 인증 사용
+            const result = await Api.patch(`/posts/${this.postId}`, {
                 title,
                 content,
                 image: imageData

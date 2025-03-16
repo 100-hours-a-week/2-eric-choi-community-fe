@@ -69,11 +69,11 @@ class Login {
         
         const email = this.emailInput.value;
         const password = this.passwordInput.value;
-
+    
         // 유효성 검사
         const isEmailValid = !this.emailInput.classList.contains('input-error');
         const isPasswordValid = !this.passwordInput.classList.contains('input-error');
-
+    
         if (!isEmailValid || !isPasswordValid) {
             if (!isEmailValid) {
                 this.emailValidation.classList.add('show-error');
@@ -85,13 +85,14 @@ class Login {
             }
             return;
         }
-
+    
         try {
+            localStorage.removeItem('currentUser');
+            
+            // credentials: 'include' 옵션으로 쿠키 전송 보장
             const result = await Api.post('/users/auth', { email, password });
             
             if (result?.message === "login_success") {
-                // 로그인 성공 시 사용자 정보 저장
-                localStorage.setItem('currentUser', JSON.stringify(result.data));
                 window.location.href = "posts.html";
             } else {
                 alert('이메일 또는 비밀번호가 올바르지 않습니다.');

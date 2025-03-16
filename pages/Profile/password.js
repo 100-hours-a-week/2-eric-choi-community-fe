@@ -27,14 +27,14 @@ class PasswordEdit {
     
     async loadUserData() {
         try {
-            // localStorage에서 사용자 정보 가져오기
-            const userJson = localStorage.getItem('currentUser');
-            if (!userJson) {
+            // 서버에서 사용자 정보 가져오기
+            const response = await Api.get('/users/me');
+            if (!response.data) {
                 window.location.href = 'index.html';
                 return;
             }
             
-            this.currentUser = JSON.parse(userJson);
+            this.currentUser = response.data;
         } catch (error) {
             console.error('Failed to load user data:', error);
             window.location.href = 'index.html';

@@ -33,14 +33,14 @@ class PostDetail {
     
     async loadUserData() {
         try {
-            // localStorage에서 사용자 정보 가져오기
-            const userJson = localStorage.getItem('currentUser');
-            if (!userJson) {
+            // 서버에서 현재 로그인된 사용자 정보 조회
+            const response = await Api.get('/users/me');
+            if (!response.data) {
                 window.location.href = 'index.html';
                 return;
             }
             
-            this.currentUser = JSON.parse(userJson);
+            this.currentUser = response.data;
         } catch (error) {
             console.error('Failed to load user data:', error);
             window.location.href = 'index.html';
@@ -89,8 +89,7 @@ class PostDetail {
         
         // 수정/삭제 버튼
         this.editBtn?.addEventListener('click', () => {
-            const encodedEmail = encodeURIComponent(this.currentUser.email);
-            window.location.href = `edit-post.html?id=${this.postId}&email=${encodedEmail}`;
+            window.location.href = `edit-post.html?id=${this.postId}`;
         });
         
         this.deleteBtn?.addEventListener('click', this.handlePostDelete.bind(this));
@@ -100,16 +99,16 @@ class PostDetail {
         try {
             console.log('게시글 데이터 로드, 첫 로드 여부:', this.firstLoad);
             // incrementView 파라미터 추가
-            const incrementViewParam = this.firstLoad ? '&incrementView=true' : '&incrementView=false';
+            const incrementViewParam = this.firstLoad ? '?incrementView=true' : '?incrementView=false';
             // 첫 로드 후 false로 설정
             this.firstLoad = false;
             
-            // 파라미터 추가하여 게시글 데이터 로드
-            const response = await Api.get(`/posts/${this.postId}?email=${encodeURIComponent(this.currentUser.email)}${incrementViewParam}`);
+            // 이메일 파라미터 제거, 세션에서 사용자 인증
+            const response = await Api.get(`/posts/${this.postId}${incrementViewParam}`);
             this.post = response.data;
             
-            // 좋아요 상태 별도 확인
-            const likeStatus = await Api.get(`/posts/${this.postId}/likes/status?email=${encodeURIComponent(this.currentUser.email)}`);
+            // 좋아요 상태 별도 확인 - 이메일 파라미터 제거
+            const likeStatus = await Api.get(`/posts/${this.postId}/likes/status`);
             this.isLiked = likeStatus.data.data;
             
             this.displayPost();
@@ -186,30 +185,30 @@ class PostDetail {
         const statBox = e.target.closest('.stat-box');
         if (statBox && statBox.querySelector('.stat-label').textContent === '좋아요수') {
             try {
-                let success;
-                const emailParam = '?email=' + encodeURIComponent(this.currentUser.email);
+                console.log('좋아요 토글 시작, 현재 상태:', this.isLiked);
                 
-                if (this.isLiked) {
-                    // 좋아요 취소: DELETE 요청 - 요청 본문 필요 없음
-                    success = await Api.delete(`/posts/${this.postId}/likes${emailParam}`);
+                let success;
+                
+                if (this.isLiked === true) {
+                    console.log('좋아요 취소 요청 보냄 (DELETE)');
+                    success = await Api.delete(`/posts/${this.postId}/likes`);
                     this.isLiked = false;
                 } else {
-                    // 좋아요 추가: POST 요청 - 요청 본문에 postId 필요
-                    success = await Api.post(`/posts/${this.postId}/likes${emailParam}`, {
+                    console.log('좋아요 추가 요청 보냄 (POST)');
+                    success = await Api.post(`/posts/${this.postId}/likes`, {
                         postId: parseInt(this.postId)
                     });
                     this.isLiked = true;
                 }
                 
+                console.log('요청 후 좋아요 상태:', this.isLiked);
+                
                 if (success) {
                     await this.loadPostData();
+                    console.log('데이터 다시 로드 후 좋아요 상태:', this.isLiked);
                 }
             } catch (error) {
-                console.error('Failed to toggle like:', error);
-                // 오류 메시지 표시 (선택 사항)
-                if (error.message && error.message.includes('Unauthorized')) {
-                    console.log('이미 처리된 요청이거나 권한이 없습니다.');
-                }
+                console.error('좋아요 토글 실패:', error);
             }
         }
     }
@@ -220,21 +219,19 @@ class PostDetail {
         const content = this.commentInput.value.trim();
         if (!content) return;
     
-        const emailParam = '?email=' + encodeURIComponent(this.currentUser.email);
-    
         try {
             let success;  // 미리 선언
     
             // 수정 모드라면 PATCH 요청
             if (this.isEditingComment) {
-                // PATCH 요청
-                success = await Api.patch(`/posts/${this.postId}/comments/${this.editingCommentId}` + emailParam, {
+                // PATCH 요청 - 이메일 파라미터 제거
+                success = await Api.patch(`/posts/${this.postId}/comments/${this.editingCommentId}`, {
                     userId: this.currentUser.id,
                     content
                 });
             } else {
-                // POST 요청
-                success = await Api.post(`/posts/${this.postId}/comments` + emailParam, {
+                // POST 요청 - 이메일 파라미터 제거
+                success = await Api.post(`/posts/${this.postId}/comments`, {
                     userId: this.currentUser.id,
                     content
                 });
@@ -279,7 +276,6 @@ class PostDetail {
     }
     
     async showDeleteCommentModal(commentId) {
-        const emailParam = '?email=' + encodeURIComponent(this.currentUser.email);
         const modal = new Modal({
             title: '댓글을 삭제하시겠습니까?',
             message: '삭제한 내용은 복구할 수 없습니다.'
@@ -289,7 +285,8 @@ class PostDetail {
         
         modal.onConfirm(async () => {
             try {
-                const success = await Api.delete(`/posts/${this.postId}/comments/${commentId}` + emailParam, {
+                // 이메일 파라미터 제거
+                const success = await Api.delete(`/posts/${this.postId}/comments/${commentId}`, {
                     userId: this.currentUser.id
                 });
                 
@@ -309,7 +306,6 @@ class PostDetail {
     }
     
     async handlePostDelete() {
-        const emailParam = '?email=' + encodeURIComponent(this.currentUser.email);
         const modal = new Modal({
             title: '게시글을 삭제하시겠습니까?',
             message: '삭제한 내용은 복구할 수 없습니다.'
@@ -319,7 +315,8 @@ class PostDetail {
         
         modal.onConfirm(async () => {
             try {
-                const success = await Api.delete(`/posts/${this.postId}` + emailParam, {
+                // 이메일 파라미터 제거
+                const success = await Api.delete(`/posts/${this.postId}`, {
                     userId: this.currentUser.id
                 });
                 
