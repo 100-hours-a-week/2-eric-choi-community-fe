@@ -15,10 +15,10 @@ class PostDetail {
         this.post = null;
         this.isEditingComment = false;
         this.editingCommentId = null;
+        this.firstLoad = true; // 여기에 추가
         
         this.init();
     }
-    
     async init() {
         if (!this.postId) {
             window.location.href = 'posts.html';
@@ -98,13 +98,19 @@ class PostDetail {
     
     async loadPostData() {
         try {
-            // 게시글 데이터 로드
-            const response = await Api.get(`/posts/${this.postId}?email=${encodeURIComponent(this.currentUser.email)}`);
+            console.log('게시글 데이터 로드, 첫 로드 여부:', this.firstLoad);
+            // incrementView 파라미터 추가
+            const incrementViewParam = this.firstLoad ? '&incrementView=true' : '&incrementView=false';
+            // 첫 로드 후 false로 설정
+            this.firstLoad = false;
+            
+            // 파라미터 추가하여 게시글 데이터 로드
+            const response = await Api.get(`/posts/${this.postId}?email=${encodeURIComponent(this.currentUser.email)}${incrementViewParam}`);
             this.post = response.data;
             
             // 좋아요 상태 별도 확인
             const likeStatus = await Api.get(`/posts/${this.postId}/likes/status?email=${encodeURIComponent(this.currentUser.email)}`);
-            this.isLiked = likeStatus.data.data; // API 응답 구조에 맞게 조정
+            this.isLiked = likeStatus.data.data;
             
             this.displayPost();
         } catch (error) {
