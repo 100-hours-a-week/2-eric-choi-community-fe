@@ -41,13 +41,14 @@ export class Header {
     }
 
     async checkLoginStatus() {
-        // 현재 페이지가 로그인 페이지인지 확인
-        const isLoginPage = window.location.href.includes('index.html') || 
+        // 로그인이 필요하지 않은 페이지 확인
+        const isAuthPage = window.location.href.includes('index.html') ||  // 로그인 페이지
+                           window.location.href.includes('signup.html') ||  // 회원가입 페이지 추가
                            window.location.pathname === '/' || 
                            window.location.pathname.endsWith('/');
         
-        // 로그인 페이지에서는 API 호출 시도하지 않고 기본값 반환
-        if (isLoginPage) {
+        // 로그인이 필요하지 않은 페이지에서는 API 호출 시도하지 않고 기본값 반환
+        if (isAuthPage) {
             return { currentUser: null, isLoggedIn: false };
         }
         

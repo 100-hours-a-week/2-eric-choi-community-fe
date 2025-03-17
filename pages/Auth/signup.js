@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (response && response.message === 'register_success') {
                 console.log('회원가입 성공:', response);
-                window.location.href = 'http://127.0.0.1:5501/html/index.html';
+                window.location.href = 'http://localhost:5502/html/index.html';
             } else {
                 console.error('회원가입 실패:', response);
                 handleSignupError(response);

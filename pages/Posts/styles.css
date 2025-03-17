@@ -192,31 +192,46 @@
     font-weight: bold;
 }
 
-/* 댓글 영역 스타일 */
+/* 댓글 영역 개선 스타일 */
 .comments-title {
     font-size: var(--text-lg);
-    margin: var(--spacing-md) 0;
+    font-weight: bold;
+    margin: var(--spacing-lg) 0 var(--spacing-md);
+    color: var(--text-primary);
+    padding-bottom: 0.5rem;
 }
 
 .comment-form {
     position: relative;
     margin: var(--spacing-sm) 0 var(--spacing-md);
+    background-color: white;
+    border-radius: var(--radius-md);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
 .comment-form textarea {
     width: 100%;
-    min-height: 169px;
-    padding: 12px;
+    min-height: 120px;
+    padding: 1rem;
     padding-bottom: 60px;
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
     font-size: var(--text-sm);
     resize: none;
     overflow-y: auto;
     white-space: pre-wrap;
     word-wrap: break-word; 
     line-height: 1.5;
+    transition: border-color 0.2s;
 }
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: #aaaaaa;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.1); 
+}
+
 
 .comment-form button {
     position: absolute;
@@ -228,13 +243,20 @@
     background-color: var(--primary-light);
     color: white;
     border: none;
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, transform 0.1s;
 }
 
 .comment-form button:not(:disabled):hover {
     background-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.comment-form button:not(:disabled):active {
+    transform: translateY(0);
 }
 
 .comment-form button:disabled {
@@ -247,100 +269,242 @@
 }
 
 .comment-item {
-    padding: var(--spacing-sm) 0;
+    padding: var(--spacing-md);
     border-bottom: 1px solid var(--border-color);
+    background-color: white;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-sm);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s;
 }
 
-.upload-button {
-    padding: 0.5rem 1rem;
-    background-color: #eee;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+.comment-item:hover {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
+}
+
+.comment-author {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.comment-author-img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.comment-author-name {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+}
+
+.comment-date {
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+}
+
+.comment-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.comment-actions button {
+    padding: 3px 8px;
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
     cursor: pointer;
-    font-size: 0.9rem;
+    transition: background-color 0.2s, color 0.2s;
 }
 
-.file-name {
-    color: #666;
-    font-size: 0.9rem;
+.comment-actions button:hover {
+    background-color: var(--border-color);
+    color: var(--text-primary);
 }
 
-.helper-text {
-    font-size: 0.85rem;
-    color: #666;
-    display: none;  
+.comment-content {
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--text-primary);
+    margin-top: var(--spacing-xs);
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
-.helper-text.error {
-    color: #ff0000;
-    display: block;
+
+.stat-box:nth-child(3) {
+    background-color: #d9d9d9;
 }
 
-.post-form-container {
+.stat-box:nth-child(3) .stat-value,
+.stat-box:nth-child(3) .stat-label {
+    color: var(--text-primary); 
+}
+
+/* 댓글 없을 때 메시지 */
+.no-comments {
+    text-align: center;
+    padding: var(--spacing-md);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-style: italic;
+    background-color: rgba(0, 0, 0, 0.02);
+    border-radius: var(--radius-md);
+    margin-top: var(--spacing-md);
+}
+
+/* 게시글 작성 및 수정 페이지 스타일 */
+.create-post-page .post-container,
+.edit-post-page .post-container {
     max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.post-form-container input[type="text"],
-.post-form-container textarea,
-.post-form-container .upload-button,
-.post-form-container .submit-button {
+.create-post-page .post-title,
+.edit-post-page .post-title {
+    font-size: var(--text-xl, 1.5rem);
+    color: var(--text-primary, #333);
+    margin-bottom: 2rem;
+    text-align: center;
+    font-weight: bold;
+}
+
+.create-post-page .post-form,
+.edit-post-page .post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.create-post-page .input-group,
+.edit-post-page .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.create-post-page .input-group label,
+.edit-post-page .input-group label {
+    font-size: var(--text-base, 1rem);
+    font-weight: 500;
+    color: var(--text-primary, #333);
+}
+
+.create-post-page .required,
+.edit-post-page .required {
+    color: red;
+    margin-left: 0.25rem;
+}
+
+.create-post-page #title,
+.edit-post-page #title {
     width: 100%;
-    box-sizing: border-box;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: var(--radius-md, 6px);
+    font-size: var(--text-base, 1rem);
 }
 
-#title,
-#content {
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 4px;
-    font-size: 1rem;
-}
-
-#title {
-    margin-bottom: 1rem;
-}
-
-#content {
-    height: 200px;
-    margin-bottom: 1rem;
+.create-post-page #content,
+.edit-post-page #content {
+    width: 100%;
+    min-height: 200px;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: var(--radius-md, 6px);
+    font-size: var(--text-base, 1rem);
     resize: vertical;
+    font-family: inherit;
 }
 
-.upload-button {
-    margin-top: 1rem;
-    padding: 6px 12px;
+.create-post-page .image-upload,
+.edit-post-page .image-upload {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.create-post-page .upload-button,
+.edit-post-page .upload-button {
+    padding: 0.5rem 1rem;
     background-color: #f0f0f0;
-    border-radius: 4px;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: var(--radius-md, 6px);
+    font-size: var(--text-sm, 0.875rem);
     cursor: pointer;
+    transition: background-color 0.2s;
 }
 
-.file-name {
-    margin-left: 10px;
-    font-size: 0.9rem;
-    color: #888;
+.create-post-page .upload-button:hover,
+.edit-post-page .upload-button:hover {
+    background-color: #e0e0e0;
 }
 
-.submit-button {
-    margin-top: 1rem;
-    width: 100%;
-    padding: 10px;
-    background-color: #7F6AEE;
+.create-post-page .file-name,
+.edit-post-page .file-name {
+    color: var(--text-secondary, #666);
+    font-size: var(--text-sm, 0.875rem);
+}
+
+.create-post-page .helper-text.error,
+.edit-post-page .helper-text.error {
+    color: red;
+    font-size: var(--text-xs, 0.75rem);
+    margin-top: 0.25rem;
+}
+
+.create-post-page .submit-button,
+.edit-post-page .submit-button {
+    align-self: center;
+    padding: 0.75rem 2rem;
+    background-color: var(--primary-light, #7F6AEE);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-md, 6px);
+    font-size: var(--text-base, 1rem);
     cursor: pointer;
-    opacity: 0.9;
+    transition: background-color 0.2s;
+    margin-top: 1rem;
+    width: auto;
 }
 
-.submit-button:hover:not(:disabled) {
-    background-color: #6d5dd1;
-    opacity: 1;
+.create-post-page .submit-button:not(:disabled):hover,
+.edit-post-page .submit-button:not(:disabled):hover {
+    background-color: var(--primary, #6d5dd1);
 }
 
-.helper-text {
-    font-size: 0.8rem;
-    color: #aaa;
-    margin-top: 0.5rem;
+.create-post-page .submit-button:disabled,
+.edit-post-page .submit-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .create-post-page .post-container,
+    .edit-post-page .post-container {
+        padding: 1.5rem 1rem;
+        margin: 2rem 1rem;
+    }
+    
+    .create-post-page .image-upload,
+    .edit-post-page .image-upload {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
