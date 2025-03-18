@@ -12,7 +12,7 @@ class ProfileEdit {
         });
         
         this.currentUser = null;
-        this.selectedFile = null;
+        this.selectedFile = null; // 실제 File 객체로 저장
         
         this.init();
     }
@@ -83,9 +83,11 @@ class ProfileEdit {
             const file = e.target.files[0];
             if (file) {
                 try {
+                    // 미리보기를 위한 DataURL 생성
                     const dataUrl = await helpers.readFile(file);
                     this.profileImage.src = dataUrl;
-                    this.selectedFile = dataUrl;
+                    // 실제 파일 객체 저장
+                    this.selectedFile = file;
                 } catch (error) {
                     console.error('Error reading file:', error);
                 }
@@ -108,11 +110,28 @@ class ProfileEdit {
         }
         
         try {
-            const success = await Api.patch(`/users/${this.currentUser.id}`, {
+            // FormData 객체 생성
+            const formData = new FormData();
+            
+            // JSON 데이터 준비
+            const userInfo = {
                 userId: this.currentUser.id,
-                nickname: nickname,
-                profileImage: this.selectedFile || this.currentUser.profileImage
-            });
+                nickname: nickname
+            };
+            
+            // FormData에 JSON 추가
+            formData.append('userInfo', new Blob([JSON.stringify(userInfo)], {
+                type: 'application/json'
+            }));
+            
+            // 이미지 파일 추가 (선택된 경우에만)
+            if (this.selectedFile) {
+                formData.append('profileImage', this.selectedFile);
+            }
+            
+            // 서버에 PATCH 요청 보내기
+            const success = await Api.patchForm(`/users/${this.currentUser.id}`, formData);
+
             
             if (success) {
                 helpers.showToast('수정 완료');
@@ -124,7 +143,7 @@ class ProfileEdit {
             console.error('Failed to update profile:', error);
             helpers.showToast('수정 실패', 2000);
         }
-    }
+        }
     
     async handleDeleteAccount() {
         const modal = new Modal({

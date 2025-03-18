@@ -10,21 +10,26 @@ export class Api {
         const timeoutId = setTimeout(() => controller.abort(), this.timeout);
         
         try {
+            // FormData인 경우 Content-Type 헤더를 설정하지 않음
+            const isFormData = options.body instanceof FormData;
+            const headers = isFormData 
+                ? { ...options.headers } 
+                : {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                };
+            
             const response = await fetch(url, {
                 ...options,
                 signal: controller.signal,
-                credentials: 'include',  // 쿠키 전송 허용
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                }
+                credentials: 'include',
+                headers
             });
             
             // 타임아웃 타이머 제거
             clearTimeout(timeoutId);
 
             if (response.status === 401 || response.status === 403) {
-                // 세션이 만료되었거나 인증 오류가 발생한 경우
                 window.location.href = 'index.html';
                 throw new Error('인증이 필요합니다.');
             }
@@ -38,13 +43,13 @@ export class Api {
                 return {};
             }
             
-            // 응답 처리를 더 안전하게 수행
+            // 응답 처리
             try {
                 const text = await response.text();
                 return text ? JSON.parse(text) : {};
             } catch (parseError) {
                 console.error('응답 파싱 오류:', parseError);
-                return {}; // 파싱 실패 시 빈 객체 반환
+                return {}; 
             }
         } catch (error) {
             // 타임아웃 타이머 제거
@@ -60,6 +65,7 @@ export class Api {
         }
     }
 
+    // 기존 메서드들
     static async get(endpoint) {
         return this.request(endpoint);
     }
@@ -79,14 +85,25 @@ export class Api {
     }
 
     static async delete(endpoint, data = null) {
-        // DELETE 요청에 body가 필요한 경우와 필요하지 않은 경우를 구분
         const options = { method: 'DELETE' };
-        
-        // data가 있는 경우만 body 추가
         if (data) {
             options.body = JSON.stringify(data);
         }
-        
         return this.request(endpoint, options);
+    }
+
+    // 새로 추가하는 FormData 메서드들
+    static async postForm(endpoint, formData) {
+        return this.request(endpoint, {
+            method: 'POST',
+            body: formData
+        });
+    }
+
+    static async patchForm(endpoint, formData) {
+        return this.request(endpoint, {
+            method: 'PATCH',
+            body: formData
+        });
     }
 }

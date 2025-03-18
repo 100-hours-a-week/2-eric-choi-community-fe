@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 프로필 이미지 업로드
-    let profileImageUrl = null;
+    let profileImageFile = null; // 파일 객체를 직접 저장
     // helperText -> validationMessage
     const profileValidationMessage = profileUpload.parentElement.querySelector('.validation-message');
     profileValidationMessage.textContent = '*프로필 사진을 업로드해주세요.';
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 reader.onload = function(e) {
                     profileUpload.style.backgroundImage = `url(${e.target.result})`;
                     profileUpload.innerHTML = '';
-                    profileImageUrl = e.target.result;
+                    profileImageFile = file; // 파일 객체를 저장
 
                     // 에러 해제
                     profileValidationMessage.textContent = '';
@@ -155,33 +155,46 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 폼 제출 처리
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
+    // 폼 제출 처리
+form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    try {
+        // FormData 객체 생성
+        const formData = new FormData();
         
-        try {
-            // 서버에 보낼 데이터 구성
-            const signupRequest = {
-                email: emailInput.value,
-                password: passwordInput.value,
-                nickname: nicknameInput.value,
-                profileImage: profileImageUrl
-            };
-            
-            // 회원가입 요청
-            const response = await Api.post('/users/new', signupRequest);
-            
-            if (response && response.message === 'register_success') {
-                console.log('회원가입 성공:', response);
-                window.location.href = 'http://localhost:5502/html/index.html';
-            } else {
-                console.error('회원가입 실패:', response);
-                handleSignupError(response);
-            }
-        } catch (error) {
-            console.error('회원가입 요청 중 오류 발생:', error);
-            alert('서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
+        // JSON 데이터 생성
+        const userInfo = {
+            email: emailInput.value,
+            password: passwordInput.value,
+            nickname: nicknameInput.value
+        };
+        
+        // FormData에 JSON 데이터 추가
+        formData.append('userInfo', new Blob([JSON.stringify(userInfo)], {
+            type: 'application/json'
+        }));
+        
+        // 이미지 파일 추가
+        if (profileImageFile) {
+            formData.append('profileImage', profileImageFile);
         }
-    });
+        
+        // 수정된 API 클래스 사용
+        const response = await Api.postForm('/users/new', formData);
+        
+        if (response && response.message === 'register_success') {
+            console.log('회원가입 성공:', response);
+            window.location.href = 'http://localhost:5502/html/index.html';
+        } else {
+            console.error('회원가입 실패:', response);
+            handleSignupError(response);
+        }
+    } catch (error) {
+        console.error('회원가입 요청 중 오류 발생:', error);
+        alert('서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    }
+});
     
     // 회원가입 오류 처리 함수
     function handleSignupError(response) {

@@ -11,7 +11,7 @@ class PostCreate {
         });
         
         this.currentUser = null;
-        this.selectedFile = null;
+        this.selectedFile = null; // 실제 File 객체
         
         this.init();
     }
@@ -121,25 +121,27 @@ class PostCreate {
             return;
         }
         
-        let imageData = null;
-        if (this.selectedFile) {
-            imageData = await helpers.readFile(this.selectedFile);
-        }
-        
-        const requestData = {
-            title,
-            content,
-            image: imageData
-        };
-        
-        console.log('요청 데이터:', { 
-            ...requestData, 
-            image: imageData ? '(이미지 데이터 존재)' : '(이미지 없음)' 
-        });
-        
         try {
-            // 세션 인증 사용하므로 이메일 파라미터 제거
-            const result = await Api.post('/posts', requestData);
+            // FormData 객체 생성
+            const formData = new FormData();
+            
+            // 게시물 정보 JSON으로 추가
+            const postInfo = {
+                title,
+                content
+            };
+            
+            formData.append('postInfo', new Blob([JSON.stringify(postInfo)], {
+                type: 'application/json'
+            }));
+            
+            // 이미지 파일 추가 (있는 경우)
+            if (this.selectedFile) {
+                formData.append('image', this.selectedFile);
+            }
+            
+            // 서버에 POST 요청 보내기
+            const result = await Api.postForm('/posts', formData);
             
             if (result) {
                 window.location.href = 'posts.html';
@@ -148,7 +150,6 @@ class PostCreate {
             console.error('Failed to create post:', error);
         }
     }
-    
 }
 
 // 페이지 로드 시 초기화
