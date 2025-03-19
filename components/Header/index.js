@@ -40,15 +40,22 @@ export class Header {
         `;
     }
 
+    // checkLoginStatus 메서드 수정
     async checkLoginStatus() {
         // 로그인이 필요하지 않은 페이지 확인
-        const isAuthPage = window.location.href.includes('index.html') ||  // 로그인 페이지
-                           window.location.href.includes('signup.html') ||  // 회원가입 페이지 추가
-                           window.location.pathname === '/' || 
-                           window.location.pathname.endsWith('/');
+        const isAuthPage = window.location.href.includes('index.html') || 
+                        window.location.href.includes('signup.html') || 
+                        window.location.pathname === '/' || 
+                        window.location.pathname.endsWith('/');
         
-        // 로그인이 필요하지 않은 페이지에서는 API 호출 시도하지 않고 기본값 반환
+        // 로그인이 필요하지 않은 페이지에서는 확인하지 않음
         if (isAuthPage) {
+            return { currentUser: null, isLoggedIn: false };
+        }
+        
+        // 메모리에 토큰이 있는지 확인
+        const token = Api.getToken();
+        if (!token) {
             return { currentUser: null, isLoggedIn: false };
         }
         
@@ -59,11 +66,9 @@ export class Header {
             }
         } catch (error) {
             // 인증 오류는 예상된 오류이므로 조용히 처리
-            if (error.message && error.message.includes('인증이 필요합니다')) {
-                console.log('로그인 필요: 인증되지 않은 상태');
-            } else {
-                console.error('사용자 정보 가져오기 실패:', error);
-            }
+            console.log('사용자 정보 가져오기 실패:', error);
+            // 토큰이 유효하지 않으면 메모리 정리
+            Api.setToken(null);
         }
         
         return { currentUser: null, isLoggedIn: false };
@@ -108,7 +113,8 @@ export class Header {
                 } catch (error) {
                     console.error('로그아웃 요청 실패:', error);
                 } finally {
-                    localStorage.removeItem('currentUser');
+                    // 메모리에서 액세스 토큰 제거
+                    Api.setToken(null);
                     window.location.href = '../html/index.html';
                 }
             });

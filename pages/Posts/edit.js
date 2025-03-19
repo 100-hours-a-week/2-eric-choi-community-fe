@@ -33,6 +33,13 @@ class PostEdit {
     }
     
     async loadUserData() {
+        // 로컬 스토리지에 토큰이 없으면 로그인 페이지로 리다이렉트
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            window.location.href = 'index.html';
+            return;
+        }
+        
         try {
             // 서버에서 현재 로그인된 사용자 정보 조회
             const response = await Api.get('/users/me');
@@ -50,7 +57,7 @@ class PostEdit {
     
     async loadPostData() {
         try {
-            // 이메일 파라미터 제거 - 세션 기반 인증 사용
+            // JWT 인증 방식 사용 - Api 클래스에서 자동으로 Authorization 헤더 추가
             const response = await Api.get(`/posts/${this.postId}?incrementView=false`);
             this.post = response.data;
             
@@ -167,21 +174,27 @@ class PostEdit {
             return;
         }
         
-        let imageData = null;
-        if (this.selectedFile) {
-            imageData = await helpers.readFile(this.selectedFile);
-        } else if (this.post.image) {
-            // 기존 이미지 유지
-            imageData = this.post.image;
-        }
-        
         try {
-            // 이메일 파라미터 제거 - 세션 기반 인증 사용
-            const result = await Api.patch(`/posts/${this.postId}`, {
+            // FormData 객체 생성
+            const formData = new FormData();
+            
+            // JSON 데이터를 Blob으로 변환하여 추가
+            const postInfo = {
                 title,
-                content,
-                image: imageData
-            });
+                content
+            };
+            
+            formData.append('postInfo', new Blob([JSON.stringify(postInfo)], {
+                type: 'application/json'
+            }));
+            
+            // 이미지 파일 추가 (있는 경우)
+            if (this.selectedFile) {
+                formData.append('image', this.selectedFile);
+            }
+            
+            // 수정된 부분: postForm 메서드 사용
+            const result = await Api.patchForm(`/posts/${this.postId}`, formData);
             
             if (result) {
                 alert('게시글이 수정되었습니다.');

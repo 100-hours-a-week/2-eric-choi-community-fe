@@ -24,8 +24,15 @@ class ProfileEdit {
     }
     
     async loadUserData() {
+        // 로컬 스토리지에 토큰이 없으면 로그인 페이지로 리다이렉트
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            window.location.href = 'index.html';
+            return;
+        }
+        
         try {
-            // 서버에서 사용자 정보 가져오기
+            // 서버에서 현재 로그인된 사용자 정보 조회
             const response = await Api.get('/users/me');
             if (!response.data) {
                 window.location.href = 'index.html';

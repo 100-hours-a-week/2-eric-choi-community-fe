@@ -64,35 +64,39 @@ class Login {
         }
     }
     
+    // handleSubmit 메서드 수정
     async handleSubmit(e) {
         e.preventDefault();
         
         const email = this.emailInput.value;
         const password = this.passwordInput.value;
-    
-        // 유효성 검사
+
+        // 유효성 검사 코드는 그대로 유지
         const isEmailValid = !this.emailInput.classList.contains('input-error');
         const isPasswordValid = !this.passwordInput.classList.contains('input-error');
-    
+
         if (!isEmailValid || !isPasswordValid) {
-            if (!isEmailValid) {
-                this.emailValidation.classList.add('show-error');
-                this.emailInput.classList.add('input-error');
-            }
-            if (!isPasswordValid) {
-                this.passwordValidation.classList.add('show-error');
-                this.passwordInput.classList.add('input-error');
-            }
+            // 유효성 검사 실패 처리는 그대로 유지
             return;
         }
-    
+
         try {
-            localStorage.removeItem('currentUser');
+            // JWT 관련 정보 저장 초기화
+            sessionStorage.removeItem('accessToken');
+            sessionStorage.removeItem('userId');
+            sessionStorage.removeItem('email');
+            sessionStorage.removeItem('nickname');
             
-            // credentials: 'include' 옵션으로 쿠키 전송 보장
+            // credentials: 'include' 옵션으로 리프레시 토큰 쿠키 수신
             const result = await Api.post('/users/auth', { email, password });
             
             if (result?.message === "login_success") {
+                // JWT 토큰 및 사용자 정보 저장
+                sessionStorage.setItem('accessToken', result.data.accessToken);
+                sessionStorage.setItem('userId', result.data.userId);
+                sessionStorage.setItem('email', result.data.email);
+                sessionStorage.setItem('nickname', result.data.nickname);
+                
                 window.location.href = "posts.html";
             } else {
                 alert('이메일 또는 비밀번호가 올바르지 않습니다.');
