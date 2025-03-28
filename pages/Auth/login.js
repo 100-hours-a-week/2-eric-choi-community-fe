@@ -89,14 +89,15 @@ class Login {
             
             // credentials: 'include' 옵션으로 리프레시 토큰 쿠키 수신
             const result = await Api.post('/users/auth', { email, password });
-            
+            console.log(result)
             if (result?.message === "login_success") {
                 // JWT 토큰 및 사용자 정보 저장
+                console.log('로그인 성공하여 토큰 세팅 시작')
                 sessionStorage.setItem('accessToken', result.data.accessToken);
                 sessionStorage.setItem('userId', result.data.userId);
                 sessionStorage.setItem('email', result.data.email);
                 sessionStorage.setItem('nickname', result.data.nickname);
-                
+                console.log('토큰 세팅 완료')
                 window.location.href = "posts.html";
             } else {
                 alert('이메일 또는 비밀번호가 올바르지 않습니다.');

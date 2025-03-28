@@ -34,7 +34,7 @@ class PostEdit {
     
     async loadUserData() {
         // 로컬 스토리지에 토큰이 없으면 로그인 페이지로 리다이렉트
-        const token = localStorage.getItem('accessToken');
+        const token = sessionStorage.getItem('accessToken');
         if (!token) {
             window.location.href = 'index.html';
             return;

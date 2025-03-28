@@ -47,20 +47,27 @@ export class Header {
                         window.location.href.includes('signup.html') || 
                         window.location.pathname === '/' || 
                         window.location.pathname.endsWith('/');
-        
+        console.log(`isAuthPage = ${isAuthPage}`)
         // 로그인이 필요하지 않은 페이지에서는 확인하지 않음
         if (isAuthPage) {
+            console.log('인증이 필요한 페이지 접근')
             return { currentUser: null, isLoggedIn: false };
         }
+        console.log('인증이 필요없는 페이지 접근')
         
         // 메모리에 토큰이 있는지 확인
         const token = Api.getToken();
+        console.log(`token = ${token}`)
+
         if (!token) {
             return { currentUser: null, isLoggedIn: false };
         }
         
         try {
             const response = await Api.get('/users/me');
+            console.log(`response = ${response}`)
+            
+
             if (response && response.data) {
                 return { currentUser: response.data, isLoggedIn: true };
             }

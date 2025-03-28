@@ -108,7 +108,7 @@ export class Api {
             
             const data = await response.json();
             if (data.data && data.data.accessToken) {
-                localStorage.setItem('accessToken', data.data.accessToken);
+                sessionStorage.setItem('accessToken', data.data.accessToken);
                 return true;
             }
             
@@ -125,6 +125,7 @@ export class Api {
     }
 
     static async post(endpoint, data) {
+        console.log('post 요청 send')
         return this.request(endpoint, {
             method: 'POST',
             body: JSON.stringify(data)
