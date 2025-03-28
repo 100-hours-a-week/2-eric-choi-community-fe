@@ -1,0 +1,32 @@
+{
+    "message": "posts_fetch_success",
+    "data": [
+        {
+            "id": 1,
+            "title": "첫 번째 게시글",
+            "content": "게시글 내용입니다",
+            "createdAt": "2024-02-21T12:30:00Z",
+            "viewCount": 100,
+            "likeCount": 50,
+            "commentCount": 1,
+            "image": null,
+            "author": {
+                "nickname": "startup",
+                "profileImageUrl": "/api/placeholder/24/24"
+            },
+            "comments": [
+                {
+                    "id": 1,
+                    "content": "첫번째 댓글입니다",
+                    "createdAt": "2024-02-21T12:35:00Z",
+                    "author": {
+                        "nickname": "user1",
+                        "profileImageUrl": "/api/placeholder/24/24"
+                    }
+                }
+            ]
+        }
+
+    ],
+    "hasNextPage": false
+}

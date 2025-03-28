@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아무 말 대잔치 - 회원가입</title>
+    <link rel="stylesheet" href="../styles/reset.css">
+    <link rel="stylesheet" href="../styles/variables.css">
+    <link rel="stylesheet" href="../components/Header/styles.css">
+    <link rel="stylesheet" href="../pages/Auth/styles.css">
+</head>
+<body>
+    <!-- 헤더를 직접 하드코딩하지 말고, 컴포넌트가 삽입될 컨테이너만 제공 -->
+    <div id="header-container"></div>
+
+    <main class="signup-container">
+        <h2 class="signup-title">회원가입</h2>
+        
+        <form id="signupForm" class="signup-form">
+            <!-- 프로필 사진 업로드 영역 -->
+            <div class="profile-upload">
+                <label>프로필사진</label>
+                <p class="validation-message"></p>  
+                <div class="profile-circle">
+                    <span class="plus-icon">+</span>
+                </div>
+            </div>
+
+            <!-- 이메일 입력 -->
+            <div class="input-group">
+                <label>이메일*</label>
+                <input type="email" id="email" name="email" required placeholder="이메일을 입력하세요">
+                <p class="validation-message"></p>  
+            </div>
+
+            <!-- 비밀번호 입력 -->
+            <div class="input-group">
+                <label>비밀번호*</label>
+                <input type="password" id="password" name="password" required placeholder="비밀번호를 입력하세요">
+                <p class="validation-message"></p>  
+            </div>
+
+            <!-- 비밀번호 확인 -->
+            <div class="input-group">
+                <label>비밀번호 확인*</label>
+                <input type="password" id="passwordConfirm" name="passwordConfirm" required placeholder="비밀번호를 한번 더 입력하세요">
+                <p class="validation-message"></p>  
+            </div>
+
+            <!-- 닉네임 입력 -->
+            <div class="input-group">
+                <label>닉네임*</label>
+                <input type="text" id="nickname" name="nickname" required placeholder="닉네임을 입력하세요">
+                <p class="validation-message"></p> 
+
+            <!-- 회원가입 버튼 -->
+            <button type="submit" class="signup-button">회원가입</button>
+            <a href="index.html" class="login-link">로그인하러 가기</a>
+        </form>
+    </main>
+
+    <!-- 수정된 signup.js 경로 -->
+    <script type="module" src="../pages/Auth/signup.js"></script>
+</body>
+</html>

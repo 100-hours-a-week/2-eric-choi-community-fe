@@ -1,0 +1,177 @@
+/* 로그인 페이지 스타일 */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 300px;
+}
+
+.login-title {
+    text-align: center;
+    font-size: 2rem;
+    color: var(--text-primary, #333);
+    margin-bottom: 3rem;
+}
+
+.login-form {
+    width: 392px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.input-group {
+    width: 355px;
+    display: flex;         
+    flex-direction: column; 
+    align-items: flex-start;  
+    margin-bottom: var(--spacing-sm, 1rem);
+}
+
+.input-group label {
+    width: 100%;
+    text-align: left; 
+    font-size: var(--text-sm, 0.875rem);
+    color: var(--text-primary, #333);
+    margin-bottom: var(--spacing-xs, 0.5rem);
+}
+
+.input-group input {
+    width: 100%;
+    padding: var(--spacing-xs, 0.5rem);
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: var(--radius-sm, 4px);
+    font-size: var(--text-sm, 0.875rem);
+}
+
+.validation-messages {
+    width: 355px;
+    margin: var(--spacing-sm, 1rem) 0;
+}
+
+.validation-message {
+    text-align: left;
+    font-size: var(--text-xs, 0.75rem);
+    color: var(--text-secondary, #666);
+    line-height: 1.4;
+    display: none;
+}
+
+.validation-message.show-error {
+    color: var(--error, #ff4444);
+    display: block;
+}
+
+.input-error {
+    border-color: var(--error, #ff4444) !important;
+}
+
+button[type="submit"] {
+    width: 355px;
+    padding: var(--spacing-sm, 0.75rem);
+    background-color: var(--primary-light, #ACA0EB);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm, 4px);
+    font-size: var(--text-sm, 0.875rem);
+    cursor: pointer;
+    margin-top: var(--spacing-sm, 1rem);
+}
+
+button[type="submit"]:hover {
+    background-color: var(--primary, #7F6AEE);
+}
+
+button[type="submit"]:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.signup-link {
+    color: var(--text-secondary, #666);
+    text-decoration: none;
+    font-size: var(--text-sm, 0.875rem);
+    margin-top: var(--spacing-md, 1.5rem);
+    cursor: pointer;
+}
+
+.signup-link:hover {
+    color: var(--text-primary, #111);
+}
+
+/* 회원가입 페이지 스타일 */
+.signup-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: var(--spacing-lg, 2rem);
+    margin-top: 150px;
+}
+
+.signup-title {
+    text-align: center;
+    font-size: var(--text-xl, 1.5rem);
+    margin-bottom: var(--spacing-lg, 2rem);
+}
+
+.profile-upload {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--spacing-lg, 2rem);
+}
+
+.profile-upload label {
+    width: 80px;
+    text-align: left;
+    font-weight: bold;
+    margin-bottom: var(--spacing-xs, 0.5rem);
+}
+
+.profile-circle {
+    align-self: center;
+    width: 149px;
+    height: 149px;
+    border-radius: 50%;
+    background-color: #C4C4C4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-bottom: var(--spacing-xs, 0.5rem);
+    margin-top: var(--spacing-sm, 1rem);
+    background-size: cover;
+    background-position: center;
+}
+
+.plus-icon {
+    font-size: 2rem;
+    color: var(--text-secondary, #666);
+}
+
+.signup-button {
+    width: 100%;
+    padding: var(--spacing-sm, 0.75rem);
+    background-color: var(--primary-light, #ACA0EB);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm, 4px);
+    font-size: var(--text-sm, 0.875rem);
+    cursor: pointer;
+    margin-top: var(--spacing-sm, 1rem);
+}
+
+.signup-button:hover {
+    background-color: var(--primary, #7F6AEE);
+}
+
+.login-link {
+    display: block;
+    text-align: center;
+    color: var(--text-secondary, #666);
+    text-decoration: none;
+    margin-top: var(--spacing-sm, 1rem);
+    font-size: var(--text-sm, 0.875rem);
+}
+
+.login-link:hover {
+    color: var(--text-primary, #111);
+}

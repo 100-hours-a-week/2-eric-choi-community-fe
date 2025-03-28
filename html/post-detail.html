@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아무 말 대잔치 - 게시글</title>
+    <link rel="stylesheet" href="../styles/reset.css">
+    <link rel="stylesheet" href="../styles/variables.css">
+    <link rel="stylesheet" href="../components/Header/styles.css">
+    <link rel="stylesheet" href="../components/Modal/styles.css">
+    <link rel="stylesheet" href="../pages/Posts/styles.css">
+</head>
+<body>
+
+    <main class="post-container">
+        <div class="post-title"></div>
+        
+        <div class="post-info">
+            <div class="author-info">
+                <img src="../assets/images/default-profile.png" alt="작성자 프로필" class="author-img">
+                <span class="author-name"></span>
+                <span class="post-date"></span>
+            </div>
+            <div class="post-actions">
+                <button class="edit-btn">수정</button>
+                <button class="delete-btn">삭제</button>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="post-image">
+ 
+        </div>
+
+        <div class="post-content"></div>
+
+        <div class="post-stats">
+            <div class="stat-box">
+                <div class="stat-value">0</div>
+                <div class="stat-label">좋아요수</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">0</div>
+                <div class="stat-label">조회수</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">0</div>
+                <div class="stat-label">댓글</div>
+            </div>
+        </div>
+
+        <h3 class="comments-title">댓글</h3>
+
+        <form id="commentForm" class="comment-form">
+            <textarea placeholder="댓글을 남겨주세요!" required></textarea>
+            <button type="submit" disabled>댓글 등록</button>
+        </form>
+        <div class="comments-list">
+
+        </div>
+    </main>
+
+    <script type="module" src="../pages/Posts/detail.js"></script>
+</body>
+</html>
