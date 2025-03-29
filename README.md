@@ -1,27 +1,199 @@
-## 로그인 화면
-![image](https://github.com/user-attachments/assets/ef13975d-f563-4b63-9e39-e784653913f1)
+# 아무 말 대잔치 - 커뮤니티 웹 애플리케이션
 
-## 회원가입 화면
-![image](https://github.com/user-attachments/assets/b0b24ec0-495f-45f5-a049-5eb1b048b162)
+아무 말 대잔치는 사용자들이 자유롭게 소통하고 생각을 공유할 수 있는 반응형 커뮤니티 웹 애플리케이션입니다. 간단한 게시글 작성, 댓글 기능, 프로필 관리 등을 통해 사용자 간의 소통을 돕습니다.
 
-## 게시판 화면
-![image](https://github.com/user-attachments/assets/d00097e7-ced8-42cb-8d23-be284eeb00f6)
+## 목차
+- [프로젝트 개요](#프로젝트-개요)
+- [주요 기능](#주요-기능)
+- [기술 스택](#기술-스택)
+- [프로젝트 구조](#프로젝트-구조)
+- [설치 및 실행 방법](#설치-및-실행-방법)
+- [API 유틸리티 클래스](#API-유틸리티-클래스)
+- [화면 구성](#화면-구성)
+- [배운 점 및 문제 해결](#배운-점-및-문제-해결)
 
-## 회원정보 수정 화면
-![image](https://github.com/user-attachments/assets/7f14f51a-6e77-4365-819c-c41742e9b17e)
+## 프로젝트 개요
 
-## 회원 탈퇴 화면
-![image](https://github.com/user-attachments/assets/eb9df4c1-651e-42ce-a5da-001dd20f6f35)
+이 프로젝트는 바닐라 JavaScript를 사용하여 RESTful API와 통신하는 MPA(Multi Page Application) 방식의 커뮤니티 웹 애플리케이션입니다. 페이지마다 모듈화된 JavaScript를 사용하여 컴포넌트 기반으로 기능을 구현했습니다. 사용자 인증, 게시글/댓글 CRUD, 좋아요 기능, 프로필 관리 등 기본적인 커뮤니티 기능을 갖추고 있습니다.
 
-## 비밀번호 수정 화면
-![image](https://github.com/user-attachments/assets/d53ac954-6bb1-4123-9465-c848f6b8cd10)
+프로젝트의 주요 목표는 다음과 같습니다:
+- 바닐라 JavaScript를 사용한 모듈화된 프론트엔드 구현
+- JWT 기반의 사용자 인증 시스템 구현
+- 재사용 가능한 컴포넌트 설계
+- 모바일 우선(Mobile-First) 반응형 디자인
 
-## 게시글 작성 화면
-![image](https://github.com/user-attachments/assets/c1190df6-d831-45e0-9e31-8979ff51005c)
+## 주요 기능
 
-## 게시글 수정 화면
-![image](https://github.com/user-attachments/assets/00432251-df69-4080-8a84-e2b5c0c15631)
+- **사용자 인증**
+  - 회원가입, 로그인, 로그아웃
+  - JWT 토큰 기반 인증 및 리프레시 토큰 사용
+  - 로그인 상태 유지
 
-## 게시글 화면
-![image](https://github.com/user-attachments/assets/5c779cdf-8e76-4a65-929d-d40e2d0753fc)
+- **게시글 관리**
+  - 게시글 작성, 조회, 수정, 삭제
+  - 이미지 업로드 기능
+  - 좋아요 기능
+  - 무한 스크롤을 통한 페이지네이션
 
+- **댓글 기능**
+  - 댓글 작성, 수정, 삭제
+  - 댓글 입력 시 실시간 유효성 검사
+
+- **사용자 프로필**
+  - 프로필 이미지 업로드
+  - 사용자 정보 수정
+  - 비밀번호 변경
+  - 회원 탈퇴
+
+- **유틸리티 기능**
+  - 폼 유효성 검사
+  - 토스트 메시지
+  - 모달 창
+
+## 기술 스택
+
+- **프론트엔드**
+  - 바닐라 JavaScript (ES6+)
+  - HTML5 / CSS3
+  - 모듈 패턴 (ES 모듈)
+  - 클래스 기반 컴포넌트
+  - 파일 업로드 및 이미지 처리
+
+- **네트워크 & 통신**
+  - Fetch API
+  - RESTful API 연동
+  - JWT 인증
+  - FormData 처리
+
+- **보안**
+  - 입력 유효성 검사
+  - 토큰 기반 인증
+
+## 프로젝트 구조
+
+```
+├── components/         # 재사용 가능한 UI 컴포넌트
+│   ├── Form/           # 폼 관련 컴포넌트
+│   ├── Header/         # 헤더 컴포넌트
+│   └── Modal/          # 모달 컴포넌트
+├── utils/              # 유틸리티 함수 모음
+│   ├── api.js          # API 통신 클래스
+│   ├── helpers.js      # 헬퍼 함수 모음
+│   └── validation.js   # 유효성 검사 유틸리티
+├── pages/              # 페이지별 로직
+│   ├── Auth/           # 인증 관련 페이지 (로그인, 회원가입)
+│   ├── Post/           # 게시글 관련 페이지
+│   └── User/           # 사용자 관련 페이지
+├── assets/             # 정적 리소스
+│   ├── css/            # CSS 스타일시트
+│   └── images/         # 이미지 파일
+└── html/               # HTML 페이지
+    ├── index.html      # 로그인 페이지
+    ├── signup.html     # 회원가입 페이지
+    ├── posts.html      # 게시글 목록 페이지
+    ├── post-detail.html # 게시글 상세 페이지
+    ├── make-post.html  # 게시글 작성 페이지
+    ├── edit-post.html  # 게시글 수정 페이지
+    ├── edit-profile.html # 프로필 수정 페이지
+    └── edit-password.html # 비밀번호 수정 페이지
+```
+
+## 설치 및 실행 방법
+
+### 요구 사항
+- Node.js (로컬 개발 서버 실행용)
+- 최신 웹 브라우저 (Chrome, Firefox, Safari, Edge 등)
+
+### 설치 과정
+1. 저장소 클론
+   ```bash
+   git clone https://github.com/your-username/anymaldaejanchi.git
+   cd anymaldaejanchi
+   ```
+
+2. 로컬 개발 서버 실행
+   ```bash
+   # http-server 등의 정적 서버 사용
+   npx http-server -p 5502
+   ```
+
+3. 백엔드 서버 실행
+   ```bash
+   # 백엔드 서버는 별도 설치 필요 (Spring Boot 기반)
+   # 기본 포트는 8080
+   ```
+
+4. 브라우저에서 접속
+   ```
+   http://localhost:5502/html/index.html
+   ```
+
+## API 유틸리티 클래스
+
+아무 말 대잔치는 프론트엔드와 백엔드 간의 통신을 관리하기 위한 API 클래스를 구현했습니다. 이 클래스는 JWT 토큰 인증, 요청 타임아웃, 토큰 자동 갱신 등의 기능을 제공합니다.
+
+```javascript
+// API 클래스 사용 예시
+// 게시글 목록 가져오기
+const posts = await Api.get('/posts');
+
+// 새 게시글 작성
+const result = await Api.post('/posts', { title, content });
+
+// 이미지가 포함된 게시글 작성
+const formData = new FormData();
+formData.append('postInfo', new Blob([JSON.stringify(postInfo)], {
+    type: 'application/json'
+}));
+formData.append('image', imageFile);
+const result = await Api.postForm('/posts', formData);
+```
+
+## 화면 구성
+
+### 1. 로그인 / 회원가입
+- 유효성 검사를 포함한 로그인 폼
+- 프로필 이미지 업로드가 가능한 회원가입 폼
+
+### 2. 게시글 목록
+- 무한 스크롤 방식의 게시글 목록
+- 각 게시글의 작성자, 작성일, 좋아요 수, 댓글 수, 조회수 표시
+
+### 3. 게시글 상세
+- 게시글 제목, 내용, 이미지 표시
+- 좋아요 토글 기능
+- 댓글 작성, 수정, 삭제 기능
+- 작성자의 경우 게시글 수정/삭제 버튼 제공
+
+### 4. 게시글 작성/수정
+- 제목, 내용 입력 및 유효성 검사
+- 이미지 업로드 기능
+
+### 5. 프로필 관리
+- 사용자 정보 수정 (닉네임, 프로필 이미지)
+- 비밀번호 변경
+- 회원 탈퇴
+
+## 배운 점 및 문제 해결
+
+### 바닐라 JS로 구현한 컴포넌트 시스템
+프레임워크 없이 클래스 기반 컴포넌트를 설계하고 구현하며 컴포넌트 아키텍처의 작동 방식에 대한 이해를 높였습니다.
+
+### JWT 인증 시스템
+클라이언트 측에서 토큰 관리와 갱신을 처리하는 방법을 학습했습니다. 특히 accessToken과 refreshToken의 적절한 관리 방법을 이해했습니다.
+
+### 폼 처리 및 유효성 검사
+사용자 입력에 대한 실시간 유효성 검사와 FormData를 활용한 멀티파트 요청 처리 방법을 구현했습니다.
+
+### 이미지 업로드 및 미리보기
+FileReader API를 활용하여 이미지 업로드 전 미리보기 구현과 서버로의 이미지 전송 방법을 학습했습니다.
+
+### 해결한 문제들
+- **토큰 만료 처리**: 요청 중 토큰이 만료되었을 때 자동으로 리프레시 토큰을 사용하여 새 액세스 토큰을 발급받는 메커니즘 구현
+- **비동기 요청 관리**: 타임아웃 설정과 에러 핸들링으로 안정적인 API 통신 보장
+- **무한 스크롤**: 인터섹션 옵저버 API를 활용한 효율적인 무한 스크롤 구현
+- **반응형 레이아웃**: 다양한 화면 크기에 대응하는 UI 설계
+
+---
+
+본 프로젝트는 바닐라 JavaScript만을 사용해 프론트엔드 개발 기본 개념들을 탐구하고 실제 애플리케이션에 적용해 보는 경험을 제공했습니다. 사용자 중심의 UI/UX 설계와 효율적인 API 통신 방법에 중점을 두었습니다.
